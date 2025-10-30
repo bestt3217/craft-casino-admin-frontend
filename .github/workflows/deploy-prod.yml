@@ -1,0 +1,42 @@
+name: Prod Environment CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: prod-deployment
+  cancel-in-progress: false # Don't cancel deployments, queue them instead
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Prod
+        env:
+          EC2_HOST: ${{ secrets.SERVER_HOST }}
+          EC2_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          ssh $EC2_USER@$EC2_HOST 'export NVM_DIR="$HOME/.nvm" && \
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+          cd ~/casino/Sportswin-Admin-Frontend && \
+          git pull origin main && \
+          yarn install && \
+          echo "${{ secrets.PROD_ENV_FILE }}" > .env && \
+          yarn build && \
+          pm2 restart sportswin-admin-frontend && \
+          sudo systemctl restart nginx'
