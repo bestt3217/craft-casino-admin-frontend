@@ -33,10 +33,9 @@ jobs:
         run: |
           ssh $EC2_USER@$EC2_HOST 'export NVM_DIR="$HOME/.nvm" && \
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
-          cd ~/casino/Sportswin-Admin-Frontend && \
+          cd ~/craftbetmatic.pro && \
           git pull origin main && \
           yarn install && \
           echo "${{ secrets.PROD_ENV_FILE }}" > .env && \
           yarn build && \
-          pm2 restart sportswin-admin-frontend && \
-          sudo systemctl restart nginx'
+          pm2 restart admin-frontend'
