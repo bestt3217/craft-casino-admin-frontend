@@ -6,6 +6,7 @@ import React from 'react'
 import { formatNumber } from '@/lib/utils'
 
 import Loading from '@/components/common/Loading'
+import BalanceEditModal from '@/components/tables/BalanceEditModal'
 import Pagination from '@/components/tables/Pagination'
 import UserAvatar from '@/components/ui/avatar/UserAvatar'
 import Badge from '@/components/ui/badge/Badge'
@@ -42,7 +43,7 @@ export default function UsersTable({
   isLoading,
   onBanStatusChange,
   // onMuteStatusChange,
-  // onBalanceChange,
+  onBalanceChange,
 }: UsersTableProps) {
   const router = useRouter()
   const goToDetail = (id: string) => {
@@ -51,12 +52,37 @@ export default function UsersTable({
   const [openStatusDropdown, setOpenStatusDropdown] = React.useState<
     string | null
   >(null)
+  const [openBalanceDropdown, setOpenBalanceDropdown] = React.useState<
+    string | null
+  >(null)
+  const [balanceModalOpen, setBalanceModalOpen] = React.useState<string | null>(
+    null
+  )
   // const [openMuteDropdown, setOpenMuteDropdown] = React.useState<string | null>(
   //   null
   // )
 
   const toggleStatusDropdown = (userId: string) => {
     setOpenStatusDropdown(openStatusDropdown === userId ? null : userId)
+  }
+
+  const toggleBalanceDropdown = (userId: string) => {
+    setOpenBalanceDropdown(openBalanceDropdown === userId ? null : userId)
+  }
+
+  const handleOpenBalanceModal = (userId: string) => {
+    setBalanceModalOpen(userId)
+    setOpenBalanceDropdown(null)
+  }
+
+  const handleCloseBalanceModal = () => {
+    setBalanceModalOpen(null)
+  }
+
+  const handleSaveBalance = async (userId: string, balance: number) => {
+    if (onBalanceChange) {
+      await onBalanceChange(userId, balance.toString())
+    }
   }
 
   // const toggleMuteDropdown = (userId: string) => {
@@ -197,15 +223,36 @@ export default function UsersTable({
                         >
                           {row.currentLevel || '-'}
                         </TableCell>
-                        <TableCell
-                          className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
-                          onClick={() => goToDetail(row._id)}
-                        >
-                          <span className='text-theme-xs block text-gray-500 dark:text-gray-400'>
-                            {formatNumber(
-                              Number(Number(row.balance).toFixed(2))
-                            )}
-                          </span>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                          <div className='flex items-center justify-center'>
+                            <div className='relative inline-block'>
+                              <button
+                                onClick={() => toggleBalanceDropdown(row._id)}
+                                className='dropdown-toggle flex items-center gap-2'
+                              >
+                                <span className='text-theme-xs text-gray-500 dark:text-gray-400'>
+                                  {formatNumber(
+                                    Number(Number(row.balance).toFixed(2))
+                                  )}
+                                </span>
+                                <MoreDotIcon className='text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' />
+                              </button>
+                              <Dropdown
+                                isOpen={openBalanceDropdown === row._id}
+                                onClose={() => setOpenBalanceDropdown(null)}
+                                className='w-fit p-2'
+                              >
+                                <DropdownItem
+                                  onItemClick={() => {
+                                    handleOpenBalanceModal(row._id)
+                                  }}
+                                  className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
+                                >
+                                  Edit Balance
+                                </DropdownItem>
+                              </Dropdown>
+                            </div>
+                          </div>
                         </TableCell>
                         {/* <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           <div className='flex items-center justify-center'>
@@ -341,6 +388,26 @@ export default function UsersTable({
           </div>
         </div>
       )}
+      {balanceModalOpen &&
+        tableData.find((row) => row._id === balanceModalOpen) && (
+          <BalanceEditModal
+            isOpen={true}
+            onClose={handleCloseBalanceModal}
+            currentBalance={Number(
+              tableData.find((row) => row._id === balanceModalOpen)?.balance ||
+                0
+            )}
+            username={
+              tableData.find((row) => row._id === balanceModalOpen)?.username ||
+              ''
+            }
+            onSave={async (balance: number) => {
+              if (balanceModalOpen) {
+                await handleSaveBalance(balanceModalOpen, balance)
+              }
+            }}
+          />
+        )}
     </>
   )
 }
