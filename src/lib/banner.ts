@@ -7,13 +7,14 @@ export const bannerFormSchema = z.object({
   language: z
     .object({
       code: z
-        .enum(['en', 'es', 'fr', 'de', 'it', 'ar', 'pt', 'zh'])
+        .enum(['en', 'es', 'fr', 'tk', 'de', 'it', 'ar', 'pt', 'zh'])
         .optional()
         .nullable(),
       name: z
         .enum(
           [
             'English',
+            'Turkish',
             'Spanish',
             'French',
             'German',
@@ -64,6 +65,7 @@ export type BannerFormValues = z.infer<typeof bannerFormSchema>
 
 export const languageOptions = [
   { code: 'en', name: 'English' },
+  { code: 'tk', name: 'Turkish' },
   { code: 'es', name: 'Spanish' },
   { code: 'fr', name: 'French' },
   { code: 'de', name: 'German' },
