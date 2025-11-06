@@ -3,6 +3,7 @@ import { ADMIN_REVIEW_STATUS, KYC_STATUS } from '@/types/kyc'
 export interface IUserData {
   _id: string
   username: string
+  fullName: string
   avatar: string
   role: string
   email: string

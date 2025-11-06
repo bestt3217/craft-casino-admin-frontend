@@ -21,6 +21,7 @@ interface InputProps {
   hint?: string // Optional hint text
   errorMessage?: string
   rootClassName?: string
+  autoComplete?: string
 }
 
 const Input: FC<InputProps> = ({
@@ -43,6 +44,7 @@ const Input: FC<InputProps> = ({
   hint,
   errorMessage,
   rootClassName = '',
+  autoComplete,
 }) => {
   // Determine input styles based on state (disabled, success, error)
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`
@@ -88,6 +90,7 @@ const Input: FC<InputProps> = ({
         max={max}
         step={step}
         disabled={disabled}
+        autoComplete={autoComplete}
         className={inputClasses}
       />
 

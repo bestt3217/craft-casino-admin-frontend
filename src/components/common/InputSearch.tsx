@@ -44,6 +44,8 @@ export const InputSearch = ({
       </span>
       <input
         ref={ref}
+        name='search'
+        id='search'
         type='text'
         className={`shadow-theme-xs focus:border-primary-500 dark:focus:border-primary-500 w-full rounded-lg border border-gray-300 bg-white px-10 py-2.5 text-gray-700 focus:ring-0 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 ${className}`}
         placeholder={placeholder}

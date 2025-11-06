@@ -222,6 +222,27 @@ export const updateUserBalance = async ({
   }
 }
 
+export const changeUserPassword = async ({
+  id,
+  password,
+}: {
+  id: string
+  password: string
+}): Promise<APICommonResponse> => {
+  try {
+    const response = await api.post<APICommonResponse>(
+      `/user/change-password`,
+      {
+        id,
+        password,
+      }
+    )
+    return response.data
+  } catch (error) {
+    handleApiError(error, 'Failed to change user password')
+  }
+}
+
 interface TransactionsParams extends PaginationParams {
   type: string
   userId: string

@@ -8,6 +8,7 @@ import { formatNumber } from '@/lib/utils'
 import Loading from '@/components/common/Loading'
 import BalanceEditModal from '@/components/tables/BalanceEditModal'
 import Pagination from '@/components/tables/Pagination'
+import PasswordChangeModal from '@/components/tables/PasswordChangeModal'
 import UserAvatar from '@/components/ui/avatar/UserAvatar'
 import Badge from '@/components/ui/badge/Badge'
 import { Dropdown } from '@/components/ui/dropdown/Dropdown'
@@ -58,6 +59,13 @@ export default function UsersTable({
   const [balanceModalOpen, setBalanceModalOpen] = React.useState<string | null>(
     null
   )
+  const [openFullNameDropdown, setOpenFullNameDropdown] = React.useState<
+    string | null
+  >(null)
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = React.useState<
+    string | null
+  >(null)
+
   // const [openMuteDropdown, setOpenMuteDropdown] = React.useState<string | null>(
   //   null
   // )
@@ -68,6 +76,10 @@ export default function UsersTable({
 
   const toggleBalanceDropdown = (userId: string) => {
     setOpenBalanceDropdown(openBalanceDropdown === userId ? null : userId)
+  }
+
+  const toggleFullNameDropdown = (userId: string) => {
+    setOpenFullNameDropdown(openFullNameDropdown === userId ? null : userId)
   }
 
   const handleOpenBalanceModal = (userId: string) => {
@@ -106,6 +118,12 @@ export default function UsersTable({
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
                       User
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
+                    >
+                      Full Name
                     </TableCell>
                     <TableCell
                       isHeader
@@ -205,6 +223,33 @@ export default function UsersTable({
                             </div>
                           </div>
                         </TableCell>
+                        <TableCell className='text-theme-sm cursor-pointer px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
+                          <div className='relative'>
+                            <button
+                              type='button'
+                              onClick={() => toggleFullNameDropdown(row._id)}
+                              className='dropdown-toggle flex items-center gap-2'
+                            >
+                              <MoreDotIcon className='text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' />
+                              {row.fullName || '-'}
+                            </button>
+                            <Dropdown
+                              isOpen={openFullNameDropdown === row._id}
+                              onClose={() => setOpenFullNameDropdown(null)}
+                              className='w-fit p-2'
+                            >
+                              <DropdownItem
+                                onItemClick={() => {
+                                  setChangePasswordModalOpen(row._id)
+                                  setOpenFullNameDropdown(null)
+                                }}
+                                className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
+                              >
+                                Change password
+                              </DropdownItem>
+                            </Dropdown>
+                          </div>
+                        </TableCell>
                         <TableCell
                           className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
                           onClick={() => goToDetail(row._id)}
@@ -227,6 +272,7 @@ export default function UsersTable({
                           <div className='flex items-center justify-center'>
                             <div className='relative inline-block'>
                               <button
+                                type='button'
                                 onClick={() => toggleBalanceDropdown(row._id)}
                                 className='dropdown-toggle flex items-center gap-2'
                               >
@@ -320,6 +366,7 @@ export default function UsersTable({
                           <div className='flex items-center justify-center'>
                             <div className='relative inline-block'>
                               <button
+                                type='button'
                                 onClick={() => toggleStatusDropdown(row._id)}
                                 className='dropdown-toggle flex items-center'
                               >
@@ -358,18 +405,18 @@ export default function UsersTable({
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           {row.lastLoginIp || 'N/A'}
                         </TableCell>
-                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           {row.lastLoginCountry || 'N/A'}
                         </TableCell>
-                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           {row.lastLoginTime
                             ? moment(row.lastLoginTime).format('YYYY-MM-DD')
                             : 'N/A'}
                         </TableCell>
-                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           {moment(row.createdAt).format('YYYY-MM-DD')}
                         </TableCell>
                       </TableRow>
@@ -406,6 +453,18 @@ export default function UsersTable({
                 await handleSaveBalance(balanceModalOpen, balance)
               }
             }}
+          />
+        )}
+      {changePasswordModalOpen &&
+        tableData.find((row) => row._id === changePasswordModalOpen) && (
+          <PasswordChangeModal
+            isOpen={true}
+            onClose={() => setChangePasswordModalOpen(null)}
+            userId={changePasswordModalOpen}
+            username={
+              tableData.find((row) => row._id === changePasswordModalOpen)
+                ?.username || ''
+            }
           />
         )}
     </>
