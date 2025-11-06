@@ -16,7 +16,7 @@ import {
 import ComponentCard from '@/components/common/ComponentCard'
 import { InputSearch } from '@/components/common/InputSearch'
 import TransactionsTable from '@/components/tables/TransactionsTable'
-import PixKeyCell from '@/components/tables/TransactionsTable/PixKeyCell'
+import PaymentMethodCell from '@/components/tables/TransactionsTable/PaymentMethodCell'
 import StatusCell from '@/components/tables/TransactionsTable/StatusCell'
 import UserCell from '@/components/tables/TransactionsTable/UserCell'
 import { Card } from '@/components/ui/card'
@@ -38,17 +38,29 @@ export default function Transactions() {
         render: (item: any) => <UserCell user={item.userId} />,
       },
       {
+        id: 'method',
+        label: 'Payment Method',
+        col: 2,
+        render: (item) => <PaymentMethodCell method={item.method} />,
+      },
+      {
+        id: 'paymentKey',
+        label: 'Account Number',
+        col: 2,
+        disabled: type === 'deposit',
+        render: (item) => item.paymentKey,
+      },
+      {
         id: 'amount',
         label: 'Amount',
         col: 2,
-        render: (item) => Number(item.amount).toFixed(2),
-      },
-      {
-        id: 'pixKey',
-        label: 'PIX Key',
-        col: 2,
-        disabled: type === 'deposit',
-        render: (item) => <PixKeyCell pixKey={item.pixKey} />,
+        render: (item) => {
+          if (item.status !== 1 && type === 'deposit') {
+            return 'N/A'
+          }
+
+          return Number(item.amount).toFixed(2)
+        },
       },
       {
         id: 'time',
@@ -281,7 +293,7 @@ export default function Transactions() {
           <h3 className='text-sm font-medium text-gray-400'>Approved</h3>
           <p className='text-2xl font-bold text-white'>{seedData.paid.count}</p>
           <p className='text-sm text-gray-400'>
-            Total Approved | R${seedData.paid.totalAmount}
+            Total Approved | TRY ₺ {seedData.paid.totalAmount}
           </p>
         </Card>
         <Card>
@@ -290,7 +302,7 @@ export default function Transactions() {
             {seedData.pending.count}
           </p>
           <p className='text-sm text-gray-400'>
-            Total Outstanding | R${seedData.pending.totalAmount}
+            Total Outstanding | TRY ₺ {seedData.pending.totalAmount}
           </p>
         </Card>
         <Card>
