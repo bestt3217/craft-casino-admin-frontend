@@ -59,6 +59,22 @@ export const approveWithdrawal = async (transactionId: string) => {
   }
 }
 
+export const rejectDepositRequest = async (transactionId: string) => {
+  try {
+    const response = await api.post(`/transactions/reject-deposit`, {
+      transactionId,
+    })
+
+    if (response.data.error) {
+      throw new Error(response.data.error)
+    }
+
+    return response.data
+  } catch (error) {
+    handleApiError(error, 'Failed to reject deposit request')
+  }
+}
+
 export const rejectWithdrawal = async (transactionId: string) => {
   try {
     const response = await api.post(`/transactions/reject-withdrawal`, {

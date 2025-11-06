@@ -9,6 +9,7 @@ import {
   approveWithdrawal,
   getSeedData,
   getTransactions,
+  rejectDepositRequest,
   rejectWithdrawal,
 } from '@/api/transactions'
 
@@ -65,9 +66,19 @@ export default function Transactions() {
         id: 'action',
         label: 'Action',
         col: 2,
-        disabled: type === 'deposit',
-        render: (item) => (
+        render: (item: any) => (
           <>
+            {item.status === 0 && type === 'deposit' && (
+              <div className='flex items-center gap-2'>
+                <button
+                  className='hover:text-brand-500'
+                  onClick={() => handleDepositRequestReject(item._id)}
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+
             {item.status === 2 ? (
               <div className='flex items-center gap-2'>
                 <button
@@ -228,6 +239,22 @@ export default function Transactions() {
     }
   }
 
+  const handleDepositRequestReject = async (transactionId: string) => {
+    try {
+      setIsLoading(true)
+      await rejectDepositRequest(transactionId)
+      fetchTransactions({ page })
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('Error approving withdrawal')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleRejectWithdrawal = async (transactionId: string) => {
     try {
       setIsLoading(true)
@@ -283,6 +310,7 @@ export default function Transactions() {
         limit={limit}
         page={page}
         isLoading={isLoading}
+        loadingClassName='h-10'
       />
     </ComponentCard>
   )
