@@ -108,7 +108,7 @@ export default function UsersTable({
       ) : (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]'>
           <div className='max-w-full overflow-x-auto'>
-            <div className='min-w-[1102px]'>
+            <div className='min-w-[1500px]'>
               <Table>
                 {/* Table Header */}
                 <TableHeader className='border-b border-gray-100 dark:border-white/[0.05]'>
@@ -130,6 +130,18 @@ export default function UsersTable({
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
                       Email
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
+                    >
+                      Turkey ID
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
+                    >
+                      Phone Number
                     </TableCell>
                     <TableCell
                       isHeader
@@ -255,6 +267,18 @@ export default function UsersTable({
                           onClick={() => goToDetail(row._id)}
                         >
                           {row.email ? row.email : '-'}
+                        </TableCell>
+                        <TableCell
+                          className='text-theme-sm cursor-pointer px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'
+                          onClick={() => goToDetail(row._id)}
+                        >
+                          {row.turkeyId || '-'}
+                        </TableCell>
+                        <TableCell
+                          className='text-theme-sm cursor-pointer px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'
+                          onClick={() => goToDetail(row._id)}
+                        >
+                          {row.phoneNumber || '-'}
                         </TableCell>
                         <TableCell
                           className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
