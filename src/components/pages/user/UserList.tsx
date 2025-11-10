@@ -104,12 +104,14 @@ export default function UserListPage() {
       })
 
       if (response.success && response.rows) {
-        // Convert data to CSV format
+        // Convert data to CSV format - matching UsersTable column order
         const headers = [
           'Username',
+          'Role',
           'Full Name',
           'Email',
-          'Role',
+          'Turkey ID',
+          'Phone Number',
           'Rank',
           'Level',
           'Balance',
@@ -117,7 +119,7 @@ export default function UserListPage() {
           'Banned Status',
           'Last Login IP',
           'Last Login Location',
-          'Last Login Time',
+          'Last Login At',
           'Member Since',
         ]
 
@@ -126,20 +128,22 @@ export default function UserListPage() {
           ...response.rows.map((row) => {
             return [
               `"${row.username || ''}"`,
+              `"${row.role || ''}"`,
               `"${row.fullName || ''}"`,
               `"${row.email || ''}"`,
-              `"${row.role || ''}"`,
-              row.currentTier || '',
-              row.currentLevel || '',
+              `"${row.turkeyId || '-'}"`,
+              `"${row.phoneNumber || '-'}"`,
+              row.currentTier || '-',
+              row.currentLevel || '-',
               Number(row.balance).toFixed(2),
-              row.isEmailVerified ? 'Yes' : 'No',
+              row.isEmailVerified ? 'Verified' : 'Not Verified',
               row.isBanned ? 'Banned' : 'Allowed',
               `"${row.lastLoginIp || 'N/A'}"`,
               `"${row.lastLoginCountry || 'N/A'}"`,
               row.lastLoginTime
-                ? moment(row.lastLoginTime).format('YYYY-MM-DD HH:mm:ss')
+                ? moment(row.lastLoginTime).format('YYYY-MM-DD')
                 : 'N/A',
-              moment(row.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+              moment(row.createdAt).format('YYYY-MM-DD'),
             ].join(',')
           }),
         ]
