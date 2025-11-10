@@ -3,7 +3,7 @@
 import React, { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import { banUser, getUsers, muteUser, updateUserBalance } from '@/api/users'
+import { addUserBalance, banUser, getUsers, muteUser } from '@/api/users'
 
 import ComponentCard from '@/components/common/ComponentCard'
 import { InputSearch } from '@/components/common/InputSearch'
@@ -75,7 +75,7 @@ export default function UserListPage() {
 
   const handleBalanceChange = async (userId: string, balance: string) => {
     try {
-      const response = await updateUserBalance({
+      const response = await addUserBalance({
         id: userId,
         balance: parseFloat(balance),
       })

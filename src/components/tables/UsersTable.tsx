@@ -91,7 +91,7 @@ export default function UsersTable({
     setBalanceModalOpen(null)
   }
 
-  const handleSaveBalance = async (userId: string, balance: number) => {
+  const handleAddBalance = async (userId: string, balance: number) => {
     if (onBalanceChange) {
       await onBalanceChange(userId, balance.toString())
     }
@@ -318,7 +318,7 @@ export default function UsersTable({
                                   }}
                                   className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                                 >
-                                  Edit Balance
+                                  Add Balance
                                 </DropdownItem>
                               </Dropdown>
                             </div>
@@ -474,7 +474,7 @@ export default function UsersTable({
             }
             onSave={async (balance: number) => {
               if (balanceModalOpen) {
-                await handleSaveBalance(balanceModalOpen, balance)
+                await handleAddBalance(balanceModalOpen, balance)
               }
             }}
           />

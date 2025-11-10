@@ -21,27 +21,37 @@ export default function BalanceEditModal({
   username,
   onSave,
 }: BalanceEditModalProps) {
-  const [balance, setBalance] = useState<string>(currentBalance.toString())
+  const [amountToAdd, setAmountToAdd] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
     if (isOpen) {
-      setBalance(currentBalance.toString())
+      setAmountToAdd('')
       setError('')
     }
   }, [isOpen, currentBalance])
 
-  const handleSave = async () => {
-    const balanceValue = parseFloat(balance)
+  const amountValue = parseFloat(amountToAdd) || 0
+  const newBalance = currentBalance + amountValue
 
-    if (isNaN(balanceValue)) {
+  const handleSave = async () => {
+    if (amountToAdd === '' || amountToAdd === '-') {
+      setError('Please enter an amount')
+      return
+    }
+
+    const amountValue = parseFloat(amountToAdd)
+
+    if (isNaN(amountValue)) {
       setError('Please enter a valid number')
       return
     }
 
-    if (balanceValue < 0) {
-      setError('Balance cannot be negative')
+    const resultingBalance = currentBalance + amountValue
+
+    if (resultingBalance < 0) {
+      setError('Resulting balance cannot be negative')
       return
     }
 
@@ -49,7 +59,7 @@ export default function BalanceEditModal({
     setError('')
 
     try {
-      await onSave(balanceValue)
+      await onSave(resultingBalance)
       onClose()
     } catch (error) {
       console.error('Error updating balance:', error)
@@ -59,11 +69,11 @@ export default function BalanceEditModal({
     }
   }
 
-  const handleBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-    // Allow empty string, numbers, and decimals
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-      setBalance(value)
+    // Allow empty string, negative sign, numbers, and decimals
+    if (value === '' || value === '-' || /^-?\d*\.?\d*$/.test(value)) {
+      setAmountToAdd(value)
       setError('')
     }
   }
@@ -76,24 +86,53 @@ export default function BalanceEditModal({
     >
       <div>
         <h4 className='sm:text-title-sm mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90'>
-          Edit Balance
+          Add Balance
         </h4>
         <p className='mb-6 text-sm leading-6 text-gray-500 dark:text-gray-400'>
-          Update balance for user:{' '}
-          <span className='font-medium'>{username}</span>
+          Add balance for user: <span className='font-medium'>{username}</span>
         </p>
 
+        <div className='mb-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50'>
+          <div className='mb-2 flex items-center justify-between'>
+            <span className='text-sm text-gray-600 dark:text-gray-400'>
+              Current Balance:
+            </span>
+            <span className='text-lg font-semibold text-gray-900 dark:text-white'>
+              {currentBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+          </div>
+          <div className='flex items-center justify-between border-t border-gray-200 pt-2 dark:border-gray-700'>
+            <span className='text-sm text-gray-600 dark:text-gray-400'>
+              New Balance:
+            </span>
+            <span
+              className={`text-lg font-semibold ${
+                newBalance < 0
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-green-600 dark:text-green-400'
+              }`}
+            >
+              {newBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+          </div>
+        </div>
+
         <div className='mb-6'>
-          <Label htmlFor='balance'>Balance</Label>
+          <Label htmlFor='amount'>Amount to Add</Label>
           <Input
             type='number'
-            id='balance'
-            name='balance'
-            value={balance}
-            onChange={handleBalanceChange}
+            id='amount'
+            name='amount'
+            value={amountToAdd}
+            onChange={handleAmountChange}
             placeholder='0.00'
             step={0.1}
-            min='0'
             error={!!error}
             errorMessage={error}
             disabled={isLoading}
