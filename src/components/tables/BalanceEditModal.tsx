@@ -21,37 +21,25 @@ export default function BalanceEditModal({
   username,
   onSave,
 }: BalanceEditModalProps) {
-  const [amountToAdd, setAmountToAdd] = useState<string>('')
+  const [balance, setBalance] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
     if (isOpen) {
-      setAmountToAdd('')
+      setBalance('')
       setError('')
     }
-  }, [isOpen, currentBalance])
+  }, [isOpen])
 
-  const amountValue = parseFloat(amountToAdd) || 0
-  const newBalance = currentBalance + amountValue
+  const inputBalance = parseFloat(balance) || 0
+  const totalBalance = currentBalance + inputBalance
 
   const handleSave = async () => {
-    if (amountToAdd === '' || amountToAdd === '-') {
-      setError('Please enter an amount')
-      return
-    }
+    const value = parseFloat(balance)
 
-    const amountValue = parseFloat(amountToAdd)
-
-    if (isNaN(amountValue)) {
+    if (isNaN(value)) {
       setError('Please enter a valid number')
-      return
-    }
-
-    const resultingBalance = currentBalance + amountValue
-
-    if (resultingBalance < 0) {
-      setError('Resulting balance cannot be negative')
       return
     }
 
@@ -59,22 +47,13 @@ export default function BalanceEditModal({
     setError('')
 
     try {
-      await onSave(resultingBalance)
+      await onSave(value)
       onClose()
     } catch (error) {
-      console.error('Error updating balance:', error)
-      setError('Failed to update balance. Please try again.')
+      console.error('Error adding balance:', error)
+      setError('Failed to add balance. Please try again.')
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    // Allow empty string, negative sign, numbers, and decimals
-    if (value === '' || value === '-' || /^-?\d*\.?\d*$/.test(value)) {
-      setAmountToAdd(value)
-      setError('')
     }
   }
 
@@ -106,16 +85,10 @@ export default function BalanceEditModal({
           </div>
           <div className='flex items-center justify-between border-t border-gray-200 pt-2 dark:border-gray-700'>
             <span className='text-sm text-gray-600 dark:text-gray-400'>
-              New Balance:
+              Total Balance:
             </span>
-            <span
-              className={`text-lg font-semibold ${
-                newBalance < 0
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-green-600 dark:text-green-400'
-              }`}
-            >
-              {newBalance.toLocaleString('en-US', {
+            <span className='text-lg font-semibold text-gray-900 dark:text-white'>
+              {totalBalance.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -124,13 +97,13 @@ export default function BalanceEditModal({
         </div>
 
         <div className='mb-6'>
-          <Label htmlFor='amount'>Amount to Add</Label>
+          <Label htmlFor='balance'>Amount to Add</Label>
           <Input
             type='number'
-            id='amount'
-            name='amount'
-            value={amountToAdd}
-            onChange={handleAmountChange}
+            id='balance'
+            name='balance'
+            value={balance}
+            onChange={(e) => setBalance(e.target.value)}
             placeholder='0.00'
             step={0.1}
             error={!!error}
