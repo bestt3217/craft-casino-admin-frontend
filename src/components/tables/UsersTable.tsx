@@ -1,6 +1,5 @@
 'use client'
 import moment from 'moment'
-import { useRouter } from 'next/navigation'
 import React from 'react'
 
 import { formatNumber } from '@/lib/utils'
@@ -46,10 +45,6 @@ export default function UsersTable({
   // onMuteStatusChange,
   onBalanceChange,
 }: UsersTableProps) {
-  const router = useRouter()
-  const goToDetail = (id: string) => {
-    router.push(`/profile/${id}`)
-  }
   const [openStatusDropdown, setOpenStatusDropdown] = React.useState<
     string | null
   >(null)
@@ -193,7 +188,6 @@ export default function UsersTable({
                     </TableCell>
                   </TableRow>
                 </TableHeader>
-
                 {/* Table Body */}
                 <TableBody className='divide-y divide-gray-100 dark:divide-white/[0.05]'>
                   {tableData &&
@@ -207,14 +201,9 @@ export default function UsersTable({
                               alt={row.username}
                               size='large'
                               status='online'
-                              onClick={() => goToDetail(row._id)}
-                              className='cursor-pointer'
                             />
                             <div>
-                              <span
-                                className='text-theme-sm block cursor-pointer font-medium text-gray-800 dark:text-white/90'
-                                onClick={() => goToDetail(row._id)}
-                              >
+                              <span className='text-theme-sm block font-medium text-gray-800 dark:text-white/90'>
                                 {row.username}
                               </span>
                               <span className='text-theme-xs block text-gray-500 dark:text-gray-400'>
@@ -223,7 +212,7 @@ export default function UsersTable({
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className='text-theme-sm cursor-pointer px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           <div className='relative'>
                             <button
                               type='button'
@@ -250,22 +239,13 @@ export default function UsersTable({
                             </Dropdown>
                           </div>
                         </TableCell>
-                        <TableCell
-                          className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
-                          onClick={() => goToDetail(row._id)}
-                        >
+                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           {row.email ? row.email : '-'}
                         </TableCell>
-                        <TableCell
-                          className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
-                          onClick={() => goToDetail(row._id)}
-                        >
+                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           {row.currentTier || '-'}
                         </TableCell>
-                        <TableCell
-                          className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
-                          onClick={() => goToDetail(row._id)}
-                        >
+                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           {row.currentLevel || '-'}
                         </TableCell>
                         <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
@@ -347,10 +327,7 @@ export default function UsersTable({
                             </div>
                           </div>
                         </TableCell> */}
-                        <TableCell
-                          className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'
-                          onClick={() => goToDetail(row._id)}
-                        >
+                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           <Badge
                             size='sm'
                             color={row.isEmailVerified ? 'success' : 'error'}
@@ -362,7 +339,7 @@ export default function UsersTable({
                             </span>
                           </Badge>
                         </TableCell>
-                        <TableCell className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           <div className='flex items-center justify-center'>
                             <div className='relative inline-block'>
                               <button
