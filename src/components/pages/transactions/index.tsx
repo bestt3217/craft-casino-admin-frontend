@@ -1,5 +1,6 @@
 'use client'
 
+import { RotateCcw } from 'lucide-react'
 import moment from 'moment'
 import { useParams } from 'next/navigation'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
@@ -13,8 +14,11 @@ import {
   rejectWithdrawal,
 } from '@/api/transactions'
 
+import { TRANSACTION_STATUSES } from '@/lib/transaction'
+
 import ComponentCard from '@/components/common/ComponentCard'
 import { InputSearch } from '@/components/common/InputSearch'
+import Select from '@/components/form/Select'
 import TransactionsTable from '@/components/tables/TransactionsTable'
 import PaymentMethodCell from '@/components/tables/TransactionsTable/PaymentMethodCell'
 import StatusCell from '@/components/tables/TransactionsTable/StatusCell'
@@ -28,6 +32,48 @@ export default function Transactions() {
     () => (type === 'deposit' ? 'Deposits' : 'Withdrawals'),
     [type]
   )
+
+  const statusOptions = useMemo(() => {
+    if (type === 'deposit') {
+      return [
+        {
+          label: 'All',
+          value: '',
+        },
+        {
+          label: 'Pending',
+          value: String(TRANSACTION_STATUSES.CREATED),
+        },
+        {
+          label: 'Paid',
+          value: String(TRANSACTION_STATUSES.PAID),
+        },
+        {
+          label: 'Rejected',
+          value: String(TRANSACTION_STATUSES.REJECTED),
+        },
+      ]
+    }
+
+    return [
+      {
+        label: 'All',
+        value: '',
+      },
+      {
+        label: 'Pending',
+        value: String(TRANSACTION_STATUSES.WAITING_APPROVAL),
+      },
+      {
+        label: 'Paid',
+        value: String(TRANSACTION_STATUSES.PAID),
+      },
+      {
+        label: 'Rejected',
+        value: String(TRANSACTION_STATUSES.REJECTED),
+      },
+    ]
+  }, [type])
 
   const tableColumns = useMemo(
     () => [
@@ -121,6 +167,7 @@ export default function Transactions() {
   const [page, setPage] = useState<number>(1)
   const [limit, setLimit] = useState<number>(5)
   const [searchTerm, setSearchTerm] = useState<string>('')
+  const [selectedStatus, setSelectedStatus] = useState<string>('')
 
   const [seedData, setSeedData] = useState<any>({
     paid: {
@@ -182,16 +229,19 @@ export default function Transactions() {
   const fetchTransactions = async ({
     page,
     search,
+    status,
   }: {
     page: number
     search?: string
+    status?: string
   }) => {
     try {
       setIsLoading(true)
 
       const filters: any = {
         type: type as string,
-        search: search || searchTerm || undefined,
+        search: search !== undefined ? search : searchTerm || undefined,
+        status: status !== undefined ? status : selectedStatus || undefined,
       }
 
       const response = await getTransactions({
@@ -218,6 +268,11 @@ export default function Transactions() {
     fetchTransactions({ page })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit])
+
+  useEffect(() => {
+    fetchTransactions({ page: 1 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStatus])
 
   const handleChangePage = (page: number) => {
     setPage(page)
@@ -283,10 +338,40 @@ export default function Transactions() {
       setIsLoading(false)
     }
   }
+
+  const handleChangeStatus = useCallback((value: string) => {
+    setSelectedStatus(value)
+  }, [])
+
+  const handleReload = useCallback(() => {
+    setPage(1)
+    fetchTransactions({ page: 1 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <ComponentCard
       title={title}
-      inputSearchElement={<InputSearch fetchData={handleSearch} />}
+      inputSearchElement={
+        <div className='flex items-center gap-2'>
+          <Select
+            options={statusOptions || []}
+            placeholder='Select a status'
+            onChange={handleChangeStatus}
+            value={selectedStatus}
+            className='min-w-[200px]'
+          />
+          <InputSearch className='dark:bg-gray-900' fetchData={handleSearch} />
+          <button
+            onClick={handleReload}
+            className='flex h-11 min-w-11 items-center justify-center rounded-lg border border-gray-300 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300'
+            title='Reload'
+            aria-label='Reload transactions'
+          >
+            <RotateCcw className='h-5 w-5' />
+          </button>
+        </div>
+      }
     >
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
         <Card>

@@ -177,3 +177,11 @@ export const PIX_STATUSES = [
   'REJECTED',
   'REFUNDED',
 ]
+
+export const TRANSACTION_STATUSES = {
+  CREATED: 0,
+  PAID: 1,
+  WAITING_APPROVAL: 2,
+  PROCESSING: 3,
+  REJECTED: 4,
+}
