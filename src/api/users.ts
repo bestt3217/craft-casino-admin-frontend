@@ -204,7 +204,7 @@ export const adminReview = async ({
   }
 }
 
-export const updateUserBalance = async ({
+export const addUserBalance = async ({
   id,
   balance,
 }: {
@@ -212,7 +212,7 @@ export const updateUserBalance = async ({
   balance: number
 }): Promise<APICommonResponse> => {
   try {
-    const response = await api.post<APICommonResponse>(`/user/update-balance`, {
+    const response = await api.post<APICommonResponse>(`/user/add-balance`, {
       id,
       balance,
     })

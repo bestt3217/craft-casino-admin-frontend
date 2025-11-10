@@ -21,6 +21,8 @@ export interface IUserData {
   lastLoginCity: string | null
   nexusggrRtp?: number
   CPFNumber?: string
+  turkeyId: string | null
+  phoneNumber: string | null
 }
 
 export interface IUserWithProfile extends IUserData {

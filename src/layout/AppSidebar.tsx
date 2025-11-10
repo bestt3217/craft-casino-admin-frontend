@@ -189,11 +189,11 @@ export const navItems: NavItem[] = [
         path: '/game/casino/providers',
         pro: false,
       },
-      // {
-      //   name: 'Game Categories',
-      //   path: '/games/categories',
-      //   pro: false,
-      // },
+      {
+        name: 'Game Categories',
+        path: '/games/categories',
+        pro: false,
+      },
     ],
   },
   {

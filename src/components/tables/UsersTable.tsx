@@ -86,7 +86,7 @@ export default function UsersTable({
     setBalanceModalOpen(null)
   }
 
-  const handleSaveBalance = async (userId: string, balance: number) => {
+  const handleAddBalance = async (userId: string, balance: number) => {
     if (onBalanceChange) {
       await onBalanceChange(userId, balance.toString())
     }
@@ -103,7 +103,7 @@ export default function UsersTable({
       ) : (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]'>
           <div className='max-w-full overflow-x-auto'>
-            <div className='min-w-[1102px]'>
+            <div className='min-w-[1500px]'>
               <Table>
                 {/* Table Header */}
                 <TableHeader className='border-b border-gray-100 dark:border-white/[0.05]'>
@@ -125,6 +125,18 @@ export default function UsersTable({
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
                       Email
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
+                    >
+                      Turkey ID
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
+                    >
+                      Phone Number
                     </TableCell>
                     <TableCell
                       isHeader
@@ -242,7 +254,13 @@ export default function UsersTable({
                         <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           {row.email ? row.email : '-'}
                         </TableCell>
-                        <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
+                        <TableCell className='text-theme-sm cursor-pointer px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
+                          {row.turkeyId || '-'}
+                        </TableCell>
+                        <TableCell className='text-theme-sm cursor-pointer px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
+                          {row.phoneNumber || '-'}
+                        </TableCell>
+                        <TableCell className='text-theme-sm cursor-pointer px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                           {row.currentTier || '-'}
                         </TableCell>
                         <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
@@ -274,7 +292,7 @@ export default function UsersTable({
                                   }}
                                   className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                                 >
-                                  Edit Balance
+                                  Add Balance
                                 </DropdownItem>
                               </Dropdown>
                             </div>
@@ -427,7 +445,7 @@ export default function UsersTable({
             }
             onSave={async (balance: number) => {
               if (balanceModalOpen) {
-                await handleSaveBalance(balanceModalOpen, balance)
+                await handleAddBalance(balanceModalOpen, balance)
               }
             }}
           />
