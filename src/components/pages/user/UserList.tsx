@@ -9,7 +9,6 @@ import { addUserBalance, banUser, getUsers, muteUser } from '@/api/users'
 
 import ComponentCard from '@/components/common/ComponentCard'
 import { InputSearch } from '@/components/common/InputSearch'
-import Loading from '@/components/common/Loading'
 import UsersTable from '@/components/tables/UsersTable'
 import Button from '@/components/ui/button/Button'
 
@@ -186,7 +185,7 @@ export default function UserListPage() {
           onClick={handleExportCSV}
           disabled={isExporting}
         >
-          {isExporting ? <Loading /> : <FileIcon />} Export CSV
+          <FileIcon /> {isExporting ? 'Exporting CSV...' : 'Export CSV'}
         </Button>
       }
     >
