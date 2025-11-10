@@ -20,6 +20,15 @@ export const getGamesList = async (params: {
   }
 }
 
+export const getGameProviders = async (): Promise<any> => {
+  try {
+    const response = await api.get<any>('/casino/providers')
+    return response.data
+  } catch (error) {
+    handleApiError(error, 'Failed to get game providers')
+  }
+}
+
 export const updateGameDetail = async (
   game_code: string,
   params: { property: string; value: string | number | boolean }

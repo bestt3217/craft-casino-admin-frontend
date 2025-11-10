@@ -13,6 +13,13 @@ export interface ICasino {
   is_pinned: boolean
 }
 
+export interface IGameProvider {
+  _id: string
+  name: string
+  code: string
+  type: string
+  status: string | number
+}
 export interface ICasinoListResponse {
   rows: ICasino[]
   totalPages: number

@@ -1,14 +1,15 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { getGamesList } from '@/api/casino'
+import { getGameProviders, getGamesList } from '@/api/casino'
 
 import { InputSearch } from '@/components/common/InputSearch'
 import Loading from '@/components/common/Loading'
 import Checkbox from '@/components/form/input/Checkbox'
 import Label from '@/components/form/Label'
+import Select from '@/components/form/Select'
 import Pagination from '@/components/tables/Pagination'
 import {
   Table,
@@ -18,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { ICasino } from '@/types/casino'
+import { ICasino, IGameProvider } from '@/types/casino'
 
 export default function GamesTable({
   selectedGameIds,
@@ -31,42 +32,142 @@ export default function GamesTable({
   onSelectedChange: (selected: Set<string>) => void
   setSelectedGames: (games: ICasino[]) => void
 }) {
+  // State
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [tableData, setTableData] = useState<ICasino[]>([])
   const [page, setPage] = useState<number>(1)
   const [limit] = useState<number>(10)
   const [totalPages, setTotalPages] = useState<number>(1)
   const [search, setSearch] = useState<string>('')
+  const [selectedProvider, setSelectedProvider] = useState<string>('all')
+  const [providers, setProviders] = useState<IGameProvider[]>([])
 
-  const fetchData = async (params?: { page?: number; search?: string }) => {
+  // Refs to track current values for callbacks
+  const searchRef = useRef(search)
+  const providerRef = useRef(selectedProvider)
+  const pageRef = useRef(page)
+
+  // Update refs when state changes
+  useEffect(() => {
+    searchRef.current = search
+  }, [search])
+
+  useEffect(() => {
+    providerRef.current = selectedProvider
+  }, [selectedProvider])
+
+  useEffect(() => {
+    pageRef.current = page
+  }, [page])
+
+  // Fetch providers on mount
+  const fetchProviders = useCallback(async () => {
     try {
-      setIsLoading(true)
-      const response = await getGamesList({
-        limit,
-        page: params?.page ?? page,
-        filter: params?.search ?? search,
-      })
-      setTableData(response.rows)
-      setTotalPages(response.totalPages)
-      setPage(response.currentPage)
+      const response = await getGameProviders()
+      setProviders(response)
     } catch (error) {
-      console.error('Error fetching games:', error)
-    } finally {
-      setIsLoading(false)
+      console.error('Error fetching game providers:', error)
     }
-  }
-
-  const handleSearch = useCallback((value: string) => {
-    setSearch(value)
-    fetchData({ search: value, page: 1 })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handlePageChange = useCallback((page: number) => {
-    setPage(page)
-    fetchData({ page })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Fetch games data - uses refs to always get current values
+  const fetchData = useCallback(
+    async (params?: { page?: number; search?: string; provider?: string }) => {
+      try {
+        setIsLoading(true)
+
+        // Use passed params or current ref values (always fresh)
+        const currentPage = params?.page ?? pageRef.current
+        const currentSearch = params?.search ?? searchRef.current
+        const currentProvider = params?.provider ?? providerRef.current
+
+        const response = await getGamesList({
+          limit,
+          page: currentPage,
+          filter: currentSearch,
+          code:
+            currentProvider && currentProvider !== 'all'
+              ? currentProvider
+              : undefined,
+        })
+
+        setTableData(response.rows)
+        setTotalPages(response.totalPages)
+        setPage(response.currentPage)
+      } catch (error) {
+        console.error('Error fetching games:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [limit]
+  )
+
+  // Handlers
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearch(value)
+      setPage(1)
+      // Use refs to ensure we get current provider value
+      fetchData({
+        search: value,
+        page: 1,
+        provider: providerRef.current,
+      })
+    },
+    [fetchData]
+  )
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      // Use refs to ensure we get current search and provider values
+      fetchData({
+        page: newPage,
+        search: searchRef.current,
+        provider: providerRef.current,
+      })
+    },
+    [fetchData]
+  )
+
+  const handleProviderChange = useCallback(
+    (providerCode: string) => {
+      setSelectedProvider(providerCode)
+      setPage(1)
+      // Use refs to ensure we get current search value
+      fetchData({
+        provider: providerCode,
+        page: 1,
+        search: searchRef.current,
+      })
+    },
+    [fetchData]
+  )
+
+  // Selection handlers
+  const handleSelect = useCallback(
+    (id: string) => {
+      const newSelected = new Set(selectedGameIds)
+      if (selectedGameIds.has(id)) {
+        newSelected.delete(id)
+        setSelectedGames(selectedGames.filter((game) => game._id !== id))
+      } else {
+        newSelected.add(id)
+        const game = tableData.find((game) => game._id === id)
+        if (game) {
+          setSelectedGames([...selectedGames, game])
+        }
+      }
+      onSelectedChange(newSelected)
+    },
+    [
+      selectedGameIds,
+      selectedGames,
+      tableData,
+      onSelectedChange,
+      setSelectedGames,
+    ]
+  )
 
   // Memoize current page IDs for optimization
   const currentPageIds = useMemo(
@@ -81,21 +182,6 @@ export default function GamesTable({
       currentPageIds.every((id) => selectedGameIds.has(id)),
     [tableData.length, currentPageIds, selectedGameIds]
   )
-
-  const handleSelect = (id: string) => {
-    const newSelected = new Set(selectedGameIds)
-    if (selectedGameIds.has(id)) {
-      newSelected.delete(id)
-      setSelectedGames(selectedGames.filter((game) => game._id !== id))
-    } else {
-      newSelected.add(id)
-      setSelectedGames([
-        ...selectedGames,
-        tableData.find((game) => game._id === id),
-      ])
-    }
-    onSelectedChange(newSelected)
-  }
 
   const handleSelectAll = useCallback(() => {
     const selectedSet = new Set(selectedGameIds)
@@ -124,6 +210,23 @@ export default function GamesTable({
     setSelectedGames,
   ])
 
+  // Provider options
+  const providerOptions = useMemo(() => {
+    return [
+      { value: 'all', label: 'All Providers' },
+      ...providers.map((provider) => ({
+        value: provider.code,
+        label: provider.name,
+      })),
+    ]
+  }, [providers])
+
+  // Effects
+  useEffect(() => {
+    fetchProviders()
+  }, [fetchProviders])
+
+  // Initial data fetch on mount only
   useEffect(() => {
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,7 +236,18 @@ export default function GamesTable({
     <div className='space-y-4'>
       <div className='flex items-center justify-between gap-2'>
         <Label className='mb-0'>Available Games</Label>
-        <InputSearch fetchData={handleSearch} />
+        <div className='flex items-center gap-2'>
+          <div className='w-48'>
+            <Select
+              options={providerOptions}
+              placeholder='Select Provider'
+              onChange={handleProviderChange}
+              value={selectedProvider}
+              className='w-full'
+            />
+          </div>
+          <InputSearch fetchData={handleSearch} />
+        </div>
       </div>
 
       <div className='overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]'>
