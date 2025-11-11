@@ -130,7 +130,7 @@ export default function Transactions() {
             {item.status === 0 && type === 'deposit' && (
               <div className='flex items-center gap-2'>
                 <button
-                  className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors'
+                  className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleDepositRequestReject(item._id)}
                 >
                   Reject
@@ -141,13 +141,13 @@ export default function Transactions() {
             {item.status === 2 ? (
               <div className='flex items-center gap-2'>
                 <button
-                  className='bg-success-500 shadow-theme-xs hover:bg-success-600 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors'
+                  className='bg-success-500 shadow-theme-xs hover:bg-success-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleApproveWithdrawal(item._id)}
                 >
                   Approve
                 </button>
                 <button
-                  className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors'
+                  className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleRejectWithdrawal(item._id)}
                 >
                   Reject
