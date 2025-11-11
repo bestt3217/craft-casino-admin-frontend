@@ -1,19 +1,38 @@
 'use client'
 
-import React, { ReactNode, useEffect, useRef, useState } from 'react'
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 type Position = 'top' | 'right' | 'bottom' | 'left'
 
 interface PopoverProps {
   position: Position
   trigger: React.ReactNode
-  children: ReactNode
+  children: ReactNode | ((close: () => void) => ReactNode)
+  onClose?: () => void
+  width?: string
 }
 
-export default function Popover({ position, trigger, children }: PopoverProps) {
+export default function Popover({
+  position,
+  trigger,
+  children,
+  onClose,
+  width = '300px',
+}: PopoverProps) {
   const [isOpen, setIsOpen] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
+
+  const closePopover = useCallback(() => {
+    setIsOpen(false)
+    onClose?.()
+  }, [onClose])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -23,7 +42,7 @@ export default function Popover({ position, trigger, children }: PopoverProps) {
         triggerRef.current &&
         !triggerRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        closePopover()
       }
     }
 
@@ -31,7 +50,7 @@ export default function Popover({ position, trigger, children }: PopoverProps) {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [])
+  }, [closePopover])
 
   const togglePopover = () => setIsOpen(!isOpen)
 
@@ -59,10 +78,11 @@ export default function Popover({ position, trigger, children }: PopoverProps) {
       {isOpen && (
         <div
           ref={popoverRef}
-          className={`absolute z-99999 w-[300px] ${positionClasses[position]}`}
+          className={`absolute z-99999 ${positionClasses[position]}`}
+          style={{ width }}
         >
           <div className='shadow-theme-lg w-full rounded-xl bg-white dark:bg-[#1E2634]'>
-            {children}
+            {typeof children === 'function' ? children(closePopover) : children}
             <div
               className={`shadow-theme-lg absolute h-3 w-3 bg-white dark:bg-[#1E2634] ${arrowClasses[position]}`}
             ></div>

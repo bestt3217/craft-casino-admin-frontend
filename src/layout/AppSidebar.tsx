@@ -1,5 +1,5 @@
 'use client'
-import { Key, MegaphoneIcon, UserCircleIcon } from 'lucide-react'
+import { Key, List, MegaphoneIcon, UserCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -51,6 +51,16 @@ export const navItems: NavItem[] = [
       {
         name: 'UTM Links',
         path: `/utm-links`,
+      },
+    ],
+  },
+  {
+    icon: <List />,
+    name: 'Reports',
+    subItems: [
+      {
+        name: 'Casino',
+        path: `/reports/casino`,
       },
     ],
   },
