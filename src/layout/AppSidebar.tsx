@@ -1,5 +1,5 @@
 'use client'
-import { Key, List, MegaphoneIcon, UserCircleIcon } from 'lucide-react'
+import { Key, List, UserCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -40,20 +40,20 @@ export const navItems: NavItem[] = [
     //   },
     // ],
   },
-  {
-    icon: <MegaphoneIcon />,
-    name: 'Marketing',
-    subItems: [
-      {
-        name: 'Analytics',
-        path: '/marketing',
-      },
-      {
-        name: 'UTM Links',
-        path: `/utm-links`,
-      },
-    ],
-  },
+  // {
+  //   icon: <MegaphoneIcon />,
+  //   name: 'Marketing',
+  //   subItems: [
+  //     {
+  //       name: 'Analytics',
+  //       path: '/marketing',
+  //     },
+  //     {
+  //       name: 'UTM Links',
+  //       path: `/utm-links`,
+  //     },
+  //   ],
+  // },
   {
     icon: <List />,
     name: 'Reports',
@@ -80,22 +80,22 @@ export const navItems: NavItem[] = [
         name: 'CMS',
         path: `/cms`,
       },
-      {
-        name: 'Email Template',
-        path: `/email-template`,
-      },
-      {
-        name: 'Operating Providers',
-        path: `/operating-providers`,
-      },
-      {
-        name: 'Crypto Assets',
-        path: `/crypto/assets`,
-      },
-      {
-        name: 'Crypto Wallet',
-        path: `/crypto/wallet`,
-      },
+      // {
+      //   name: 'Email Template',
+      //   path: `/email-template`,
+      // },
+      // {
+      //   name: 'Operating Providers',
+      //   path: `/operating-providers`,
+      // },
+      // {
+      //   name: 'Crypto Assets',
+      //   path: `/crypto/assets`,
+      // },
+      // {
+      //   name: 'Crypto Wallet',
+      //   path: `/crypto/wallet`,
+      // },
     ],
   },
   {
