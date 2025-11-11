@@ -18,6 +18,7 @@ import { TRANSACTION_STATUSES } from '@/lib/transaction'
 
 import ComponentCard from '@/components/common/ComponentCard'
 import { InputSearch } from '@/components/common/InputSearch'
+import { Skeleton } from '@/components/common/Skeleton'
 import Select from '@/components/form/Select'
 import TransactionsTable from '@/components/tables/TransactionsTable'
 import PaymentMethodCell from '@/components/tables/TransactionsTable/PaymentMethodCell'
@@ -129,7 +130,7 @@ export default function Transactions() {
             {item.status === 0 && type === 'deposit' && (
               <div className='flex items-center gap-2'>
                 <button
-                  className='hover:text-brand-500'
+                  className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleDepositRequestReject(item._id)}
                 >
                   Reject
@@ -140,13 +141,13 @@ export default function Transactions() {
             {item.status === 2 ? (
               <div className='flex items-center gap-2'>
                 <button
-                  className='hover:text-brand-500'
+                  className='bg-success-500 shadow-theme-xs hover:bg-success-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleApproveWithdrawal(item._id)}
                 >
                   Approve
                 </button>
                 <button
-                  className='hover:text-brand-500 text-red-500'
+                  className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleRejectWithdrawal(item._id)}
                 >
                   Reject
@@ -162,6 +163,7 @@ export default function Transactions() {
   )
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoadingSeedData, setIsLoadingSeedData] = useState<boolean>(true)
   const [tableData, setTableData] = useState<any[]>([])
   const [totalPages, setTotalPages] = useState<number>(0)
   const [page, setPage] = useState<number>(1)
@@ -184,46 +186,53 @@ export default function Transactions() {
     },
   })
 
-  useEffect(() => {
+  const fetchSeedData = useCallback(async () => {
     try {
-      getSeedData({ type: type as string }).then((res) => {
-        const paid = {
-          count: res.paid.count,
-          totalAmount: Number(res.paid.totalAmount).toFixed(2),
-        }
-        const pending = {
-          count: res.pending.count,
-          totalAmount: Number(res.pending.totalAmount).toFixed(2),
-        }
-        const rate = Math.max(
-          Math.min(
-            Math.ceil(
-              (res.paid.count / (res.paid.count + res.pending.count || 1)) * 100
-            ),
-            100
+      setIsLoadingSeedData(true)
+      const res = await getSeedData({ type: type as string })
+      const paid = {
+        count: res.paid.count,
+        totalAmount: Number(res.paid.totalAmount).toFixed(2),
+      }
+      const pending = {
+        count: res.pending.count,
+        totalAmount: Number(res.pending.totalAmount).toFixed(2),
+      }
+      const rate = Math.max(
+        Math.min(
+          Math.ceil(
+            (res.paid.count / (res.paid.count + res.pending.count || 1)) * 100
           ),
-          0
-        )
+          100
+        ),
+        0
+      )
 
-        const health = {
-          percent: rate,
-          description:
-            rate < 50
-              ? 'Approval rate is low!'
-              : rate < 70
-                ? 'Approval rate is moderate!'
-                : 'Approval rate is good!',
-        }
+      const health = {
+        percent: rate,
+        description:
+          rate < 50
+            ? 'Approval rate is low!'
+            : rate < 70
+              ? 'Approval rate is moderate!'
+              : 'Approval rate is good!',
+      }
 
-        setSeedData({ paid, pending, health })
-      })
+      setSeedData({ paid, pending, health })
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
         toast.error('Error fetching seed data')
       }
+    } finally {
+      setIsLoadingSeedData(false)
     }
+  }, [type])
+
+  useEffect(() => {
+    fetchSeedData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type])
 
   const fetchTransactions = async ({
@@ -346,8 +355,9 @@ export default function Transactions() {
   const handleReload = useCallback(() => {
     setPage(1)
     fetchTransactions({ page: 1 })
+    fetchSeedData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [fetchSeedData])
 
   return (
     <ComponentCard
@@ -376,26 +386,57 @@ export default function Transactions() {
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
         <Card>
           <h3 className='text-sm font-medium text-gray-400'>Approved</h3>
-          <p className='text-2xl font-bold text-white'>{seedData.paid.count}</p>
-          <p className='text-sm text-gray-400'>
-            Total Approved | TRY ₺ {seedData.paid.totalAmount}
-          </p>
+          {isLoadingSeedData ? (
+            <>
+              <Skeleton className='mb-2 h-8 w-16' />
+              <Skeleton className='h-4 w-48' />
+            </>
+          ) : (
+            <>
+              <p className='text-2xl font-bold text-white'>
+                {seedData.paid.count}
+              </p>
+              <p className='text-sm text-gray-400'>
+                Total Approved | TRY ₺ {seedData.paid.totalAmount}
+              </p>
+            </>
+          )}
         </Card>
         <Card>
           <h3 className='text-sm font-medium text-gray-400'>Pending</h3>
-          <p className='text-2xl font-bold text-white'>
-            {seedData.pending.count}
-          </p>
-          <p className='text-sm text-gray-400'>
-            Total Outstanding | TRY ₺ {seedData.pending.totalAmount}
-          </p>
+          {isLoadingSeedData ? (
+            <>
+              <Skeleton className='mb-2 h-8 w-16' />
+              <Skeleton className='h-4 w-48' />
+            </>
+          ) : (
+            <>
+              <p className='text-2xl font-bold text-white'>
+                {seedData.pending.count}
+              </p>
+              <p className='text-sm text-gray-400'>
+                Total Outstanding | TRY ₺ {seedData.pending.totalAmount}
+              </p>
+            </>
+          )}
         </Card>
         <Card>
           <h3 className='text-sm font-medium text-gray-400'>Health</h3>
-          <p className='text-2xl font-bold text-white'>
-            {seedData.health.percent}%
-          </p>
-          <p className='text-sm text-gray-400'>{seedData.health.description}</p>
+          {isLoadingSeedData ? (
+            <>
+              <Skeleton className='mb-2 h-8 w-16' />
+              <Skeleton className='h-4 w-48' />
+            </>
+          ) : (
+            <>
+              <p className='text-2xl font-bold text-white'>
+                {seedData.health.percent}%
+              </p>
+              <p className='text-sm text-gray-400'>
+                {seedData.health.description}
+              </p>
+            </>
+          )}
         </Card>
       </div>
       <TransactionsTable

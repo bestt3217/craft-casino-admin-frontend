@@ -102,8 +102,8 @@ export default function UsersTable({
         <Loading />
       ) : (
         <div className='overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]'>
-          <div className='max-w-full overflow-x-auto'>
-            <div className='min-w-[1500px]'>
+          <div className='max-w-full overflow-x-auto pb-5'>
+            <div className='min-w-[1500px] pb-5'>
               <Table>
                 {/* Table Header */}
                 <TableHeader className='border-b border-gray-100 dark:border-white/[0.05]'>
