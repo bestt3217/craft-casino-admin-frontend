@@ -1,5 +1,4 @@
 'use client'
-import { ArrowDownIcon } from 'lucide-react'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,9 +8,6 @@ import { getMetrics } from '@/api/metrics'
 import { formatNumber } from '@/lib/utils'
 
 import Loading from '@/components/common/Loading'
-import Badge from '@/components/ui/badge/Badge'
-
-import { ArrowUpIcon } from '@/icons'
 
 import PixIcon from '../../../public/images/icons/pix.svg'
 
@@ -66,7 +62,7 @@ export const EcommerceMetrics = () => {
                 </h4>
               </div>
 
-              <div className='flex items-center gap-2 text-gray-500 dark:text-gray-400'>
+              {/* <div className='flex items-center gap-2 text-gray-500 dark:text-gray-400'>
                 <Badge
                   color={
                     metrics?.[0]?.upgradingPercentage > 0 ? 'success' : 'error'
@@ -81,7 +77,7 @@ export const EcommerceMetrics = () => {
                   <span className='text-xs text-gray-500 dark:text-gray-500'></span>
                 </Badge>{' '}
                 VS last month
-              </div>
+              </div> */}
             </div>
           </div>
           <div className='rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/[0.03]'>
@@ -94,11 +90,11 @@ export const EcommerceMetrics = () => {
                   {metrics?.[1]?.key}
                 </span>
                 <h4 className='text-title-sm mt-2 font-bold text-gray-800 dark:text-white/90'>
-                  R$ {formatNumber(metrics?.[1]?.value || 0)}
+                  TRY ₺ {formatNumber(metrics?.[1]?.value || 0)}
                 </h4>
               </div>
 
-              <div className='flex items-center gap-2 text-gray-500 dark:text-gray-400'>
+              {/* <div className='flex items-center gap-2 text-gray-500 dark:text-gray-400'>
                 <Badge
                   color={
                     metrics?.[1]?.upgradingPercentage > 0 ? 'success' : 'error'
@@ -112,7 +108,7 @@ export const EcommerceMetrics = () => {
                   {metrics?.[1]?.upgradingPercentage}%
                 </Badge>{' '}
                 VS last month
-              </div>
+              </div> */}
             </div>
           </div>
           <div className='rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/[0.03]'>
@@ -133,11 +129,11 @@ export const EcommerceMetrics = () => {
                   {metrics?.[2]?.key}
                 </span>
                 <h4 className='text-title-sm mt-2 font-bold text-gray-800 dark:text-white/90'>
-                  {formatNumber(metrics?.[2]?.value || 0)}
+                  {`TRY ₺ ${formatNumber(metrics?.[2]?.value || 0)}`}
                 </h4>
               </div>
 
-              <div className='flex items-center gap-2 text-gray-500 dark:text-gray-400'>
+              {/* <div className='flex items-center gap-2 text-gray-500 dark:text-gray-400'>
                 <Badge
                   color={
                     metrics?.[2]?.upgradingPercentage > 0 ? 'success' : 'error'
@@ -152,7 +148,7 @@ export const EcommerceMetrics = () => {
                   <span className='text-xs text-gray-500 dark:text-gray-500'></span>
                 </Badge>{' '}
                 VS last month
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
