@@ -122,10 +122,10 @@ export const navItems: NavItem[] = [
         name: 'Admins',
         path: '/admins',
       },
-      {
-        name: 'Roles',
-        path: `/roles`,
-      },
+      // {
+      //   name: 'Roles',
+      //   path: `/roles`,
+      // },
     ],
   },
   {
