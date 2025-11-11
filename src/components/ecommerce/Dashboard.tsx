@@ -1,5 +1,6 @@
 'use client'
 
+import DemographicCard from '@/components/ecommerce/DemographicCard'
 import { EcommerceMetrics } from '@/components/ecommerce/EcommerceMetrics'
 
 const Dashboard = () => {
@@ -22,9 +23,9 @@ const Dashboard = () => {
         <ConversionRate />
       </div> */}
 
-      {/* <div className='col-span-12'>
+      <div className='col-span-12'>
         <DemographicCard />
-      </div> */}
+      </div>
 
       {/* <div className='col-span-12 space-y-6 xl:col-span-7'>
 
