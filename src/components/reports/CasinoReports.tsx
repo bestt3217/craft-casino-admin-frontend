@@ -10,16 +10,41 @@ import { formatNumber } from '@/lib/utils'
 
 import ComponentCard from '@/components/common/ComponentCard'
 import DateRangeSelector from '@/components/common/DateRangeSelector'
+import Select from '@/components/form/Select'
 import MetricsCard from '@/components/metrics/MetricsCard'
 import CasinoReportsTable from '@/components/reports/CasinoReportsTable'
 
 import { CasinoReportsResponse } from '@/types/casino-reports'
+
+type SortByOption =
+  | 'totalBetAmount'
+  | 'totalWinAmount'
+  | 'totalGGR'
+  | 'betCount'
+  | 'winCount'
+  | 'lastTxnAt'
+
+const SORT_BY_OPTIONS = [
+  { value: 'totalBetAmount', label: 'Total Bet Amount' },
+  { value: 'totalWinAmount', label: 'Total Win Amount' },
+  { value: 'totalGGR', label: 'Total GGR' },
+  { value: 'betCount', label: 'Bet Count' },
+  { value: 'winCount', label: 'Win Count' },
+  { value: 'lastTxnAt', label: 'Last Transaction' },
+]
+
+const SORT_DIR_OPTIONS = [
+  { value: 'desc', label: 'Descending' },
+  { value: 'asc', label: 'Ascending' },
+]
 
 const CasinoReports = () => {
   const [range, setRange] = useState<DateRange | undefined>(undefined)
   const [reports, setReports] = useState<CasinoReportsResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState<SortByOption>('totalBetAmount')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
   const formatCurrency = (amount: number) => {
     return `TRY ₺ ${formatNumber(Number(amount.toFixed(2)))}`
@@ -38,6 +63,8 @@ const CasinoReports = () => {
         endDate: range.to.toISOString(),
         page,
         limit: 25,
+        sortBy,
+        sortDir,
       })
 
       if (response) {
@@ -49,7 +76,7 @@ const CasinoReports = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [range, page])
+  }, [range, page, sortBy, sortDir])
 
   useEffect(() => {
     fetchReports()
@@ -57,6 +84,16 @@ const CasinoReports = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
+  }
+
+  const handleSortByChange = (value: string) => {
+    setSortBy(value as SortByOption)
+    setPage(1) // Reset to first page when sorting changes
+  }
+
+  const handleSortDirChange = (value: string) => {
+    setSortDir(value as 'asc' | 'desc')
+    setPage(1) // Reset to first page when sorting changes
   }
 
   // Reset page when date range changes
@@ -105,10 +142,32 @@ const CasinoReports = () => {
                   <strong>Page:</strong> {reports.meta.page} of{' '}
                   {reports.meta.totalPages}
                 </span>
-                <span>
-                  <strong>Sort By:</strong> {reports.meta.sortBy} (
-                  {reports.meta.sortDir})
-                </span>
+              </div>
+            </div>
+
+            {/* Sort Controls */}
+            <div className='flex flex-wrap items-center gap-4'>
+              <div className='flex items-center gap-2'>
+                <label className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  Sort By:
+                </label>
+                <Select
+                  options={SORT_BY_OPTIONS}
+                  value={sortBy}
+                  onChange={handleSortByChange}
+                  className='min-w-[180px]'
+                />
+              </div>
+              <div className='flex items-center gap-2'>
+                <label className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  Order:
+                </label>
+                <Select
+                  options={SORT_DIR_OPTIONS}
+                  value={sortDir}
+                  onChange={handleSortDirChange}
+                  className='min-w-[140px]'
+                />
               </div>
             </div>
           </>

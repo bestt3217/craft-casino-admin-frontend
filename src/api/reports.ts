@@ -6,6 +6,8 @@ export const getCasinoReports = async (params: {
   endDate: number | string
   page?: number
   limit?: number
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
 }): Promise<any> => {
   try {
     const response = await api.get<any>('/reports/casino', { params })
