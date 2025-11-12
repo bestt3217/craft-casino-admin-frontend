@@ -8,17 +8,17 @@ import Input from '@/components/form/input/InputField'
 import Label from '@/components/form/Label'
 import Select from '@/components/form/Select'
 
-interface RealMoneyConfigProps {
+interface BonusConfigProps {
   control: Control<any>
 }
 
-const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
+const BonusConfig: React.FC<BonusConfigProps> = ({ control }) => {
   const { watch } = useFormContext()
   const rewardType = watch('rewardType')
   const type = watch('type')
-  const realMoneyType = watch('cash.type')
+  const bonusType = watch('bonus.type')
 
-  if (!['real-money'].includes(rewardType)) {
+  if (!['bonus'].includes(rewardType)) {
     return null
   }
 
@@ -28,7 +28,7 @@ const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
         <div>
           <Label>Reward Type</Label>
           <Controller
-            name='cash.type'
+            name='bonus.type'
             control={control}
             render={({ field }) => (
               <Select
@@ -54,8 +54,9 @@ const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
                 <Select
                   {...field}
                   value={field.value}
+                  onChange={(value) => field.onChange(Number(value))}
                   options={[
-                    { label: 'All', value: 'all' },
+                    { label: 'All', value: 0 },
                     { label: 'First Deposit', value: 1 },
                     { label: 'Second Deposit', value: 2 },
                     { label: 'Third Deposit', value: 3 },
@@ -69,15 +70,16 @@ const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
           </div>
         )}
 
-        {realMoneyType === 'percentage' && (
+        {bonusType === 'percentage' && (
           <div>
             <Label>Percentage (%)</Label>
             <Controller
-              name='cash.percentage'
+              name='bonus.percentage'
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
                   type='number'
                   placeholder='Enter percentage'
                 />
@@ -85,15 +87,16 @@ const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
             />
           </div>
         )}
-        {realMoneyType === 'fixed' && (
+        {bonusType === 'fixed' && (
           <div>
             <Label>Fixed Amount</Label>
             <Controller
-              name='cash.fixedAmount'
+              name='bonus.fixedAmount'
               control={control}
               render={({ field }) => (
                 <Input
                   {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
                   type='number'
                   placeholder='Enter fixed amount'
                 />
@@ -104,11 +107,13 @@ const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
         <div>
           <Label>Maximum Amount</Label>
           <Controller
-            name='cash.maxAmount'
+            name='bonus.maxAmount'
             control={control}
             render={({ field }) => (
               <Input
                 {...field}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+                onBlur={field.onBlur}
                 type='number'
                 placeholder='Enter maximum amount'
               />
@@ -120,4 +125,4 @@ const RealMoneyConfig: React.FC<RealMoneyConfigProps> = ({ control }) => {
   )
 }
 
-export default RealMoneyConfig
+export default BonusConfig

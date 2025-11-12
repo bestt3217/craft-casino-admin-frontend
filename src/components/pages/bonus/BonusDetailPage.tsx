@@ -150,6 +150,22 @@ const BonusDetailPage: React.FC<BonusDetailPageProps> = ({ bonusId }) => {
       }
     }
 
+    // Handle cash rewards
+    if (reward?.bonus) {
+      if (reward.bonus.percentage) {
+        displayText = `${reward.bonus.percentage}%`
+        if (reward.bonus.minAmount && reward.cash.maxAmount) {
+          displayText += ` of ${reward.cash.minAmount} - ${reward.cash.maxAmount}`
+        } else if (reward.bonus.minAmount) {
+          displayText += ` of ${reward.bonus.minAmount}`
+        } else if (reward.bonus.maxAmount) {
+          displayText += ` of ${reward.bonus.maxAmount}`
+        }
+      } else if (reward.bonus.amount) {
+        displayText = `Fixed ${reward.bonus.amount}`
+      }
+    }
+
     // Handle free spins
     if (reward?.freeSpins?.amount) {
       const freeSpinsText = `${reward.freeSpins.amount} Free Spins`
@@ -289,14 +305,14 @@ const BonusDetailPage: React.FC<BonusDetailPageProps> = ({ bonusId }) => {
               </p>
             </div>
 
-            <div>
+            {/* <div>
               <label className='text-sm font-medium text-gray-500 dark:text-gray-400'>
                 Claim Method
               </label>
               <p className='text-sm text-gray-900 capitalize dark:text-white'>
                 {bonus.claimMethod}
               </p>
-            </div>
+            </div> */}
           </div>
         </ComponentCard>
       </div>

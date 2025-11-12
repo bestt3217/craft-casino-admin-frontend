@@ -4,7 +4,7 @@ import { z } from 'zod'
 enum BonusType {
   WELCOME = 'welcome',
   DEPOSIT = 'deposit',
-  FREE_SPINS = 'free-spins',
+  // FREE_SPINS = 'free-spins',
   // RECURRING = 'recurring',
   // CUSTOM = 'custom',
   // DAILY = 'daily',
@@ -31,10 +31,12 @@ enum ClaimMethod {
   CODE = 'code',
 }
 
-const bonusTypeOptions = Object.entries(BonusType).map(([key, value]) => ({
-  label: key.replace(/_/g, ' '),
-  value,
-}))
+const bonusTypeOptions = Object.entries(BonusType)
+  .map(([key, value]) => ({
+    label: key.replace(/_/g, ' '),
+    value,
+  }))
+  .filter((item) => ![BonusType.WELCOME].includes(item.value))
 
 const statusOptions = Object.entries(BonusStatus).map(([key, value]) => ({
   label: key.toLowerCase(),
@@ -60,7 +62,7 @@ export const bonusFormSchema = z
     bannerImage: z.any().optional(), // For image upload handling
 
     // Reward Configuration
-    rewardType: z.enum(['real-money', 'free-spins']),
+    rewardType: z.enum(['real-money', 'free-spins', 'bonus']),
     defaultWageringMultiplier: z
       .number()
       .min(1, 'Wager amount is required')
@@ -73,6 +75,17 @@ export const bonusFormSchema = z
         percentage: z.number().optional(),
         fixedAmount: z.number().optional(),
         maxAmount: z.number().optional(),
+        depositCount: z.number().optional(),
+      })
+      .optional(),
+
+    bonus: z
+      .object({
+        type: z.string().optional(),
+        percentage: z.number().optional(),
+        fixedAmount: z.number().optional(),
+        maxAmount: z.number().optional(),
+        depositCount: z.number().optional(),
       })
       .optional(),
 

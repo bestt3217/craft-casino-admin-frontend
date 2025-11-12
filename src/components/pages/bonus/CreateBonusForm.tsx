@@ -15,7 +15,6 @@ import {
   BonusStatus,
   BonusType,
   bonusTypeOptions,
-  eligibilityOptions,
   statusOptions,
 } from '@/lib/bonus'
 
@@ -25,9 +24,9 @@ import Input from '@/components/form/input/InputField'
 import TextArea from '@/components/form/input/TextArea'
 import Label from '@/components/form/Label'
 import Select from '@/components/form/Select'
+import BonusConfig from '@/components/pages/bonus/reward-config/BonusConfig'
 import Button from '@/components/ui/button/Button'
 
-import ImageUpload from './ImageUpload'
 import FreespinConfig from './reward-config/FreespinConfig'
 import RealMoneyConfig from './reward-config/RealMoneyConfig'
 
@@ -38,7 +37,7 @@ interface CreateBonusFormProps {
 const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedBonusType, setSelectedBonusType] = useState<BonusType>(
-    BonusType.WELCOME
+    BonusType.DEPOSIT
   )
   const router = useRouter()
 
@@ -47,11 +46,11 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
     defaultValues: {
       name: '',
       description: '',
-      type: BonusType.WELCOME,
+      type: BonusType.DEPOSIT,
       status: BonusStatus.DRAFT,
       eligibility: BonusEligibility.ALL,
       rewardType: 'real-money',
-      defaultWageringMultiplier: 35,
+      defaultWageringMultiplier: 0,
       bannerImage: '',
       cash: {
         type: 'percentage',
@@ -59,15 +58,22 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
         fixedAmount: 0,
         maxAmount: 500,
       },
-      freeSpins: {
-        amount: 50,
-        gameId: '',
-        expiry: '7',
+      bonus: {
+        type: 'percentage',
+        percentage: 100,
+        fixedAmount: 0,
+        maxAmount: 500,
       },
+      // freeSpins: {
+      //   amount: 50,
+      //   gameId: '',
+      //   expiry: '7',
+      // },
     },
   })
 
-  const { handleSubmit, setValue, control } = methods
+  const { handleSubmit, setValue, watch, control, formState } = methods
+  const watchedRewardType = watch('rewardType')
 
   const onSubmit = async (data: BonusFormValues) => {
     setIsLoading(true)
@@ -75,14 +81,31 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
       // Prepare reward data based on selected rewardType
       let rewardData = {}
 
+      let depositCount = null
       if (data.rewardType === 'real-money') {
         rewardData = {
-          cash: data.cash,
+          cash: {
+            type: data.cash.type,
+            percentage: data.cash.percentage,
+            fixedAmount: data.cash.fixedAmount,
+            maxAmount: data.cash.maxAmount,
+          },
         }
+        depositCount = data.cash.depositCount
       } else if (data.rewardType === 'free-spins') {
         rewardData = {
           freeSpins: data.freeSpins,
         }
+      } else if (data.rewardType === 'bonus') {
+        rewardData = {
+          bonus: {
+            type: data.bonus.type,
+            percentage: data.bonus.percentage,
+            fixedAmount: data.bonus.fixedAmount,
+            maxAmount: data.bonus.maxAmount,
+          },
+        }
+        depositCount = data.bonus.depositCount
       }
 
       // Prepare the data to send to backend
@@ -101,8 +124,11 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
         type,
         // Add depositCount for deposit type bonuses
         metadata: {
-          ...(type === BonusType.DEPOSIT && { depositCount: 1 }),
           eligibility: data.eligibility,
+          ...(type === BonusType.DEPOSIT &&
+            depositCount && {
+              depositCount,
+            }),
         },
       }
 
@@ -144,16 +170,18 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
       return [
         { label: 'Free Spins', value: 'free-spins' },
         { label: 'Real Money', value: 'real-money' },
+        { label: 'Bonus', value: 'bonus' },
       ]
     } else if (selectedBonusType === BonusType.DEPOSIT) {
       return [
         { label: 'Real Money', value: 'real-money' },
-        { label: 'Free Spins', value: 'free-spins' },
+        { label: 'Bonus', value: 'bonus' },
+        // { label: 'Free Spins', value: 'free-spins' },
       ]
     }
     return [
-      { label: 'Real Money', value: 'real-money' },
-      { label: 'Free Spins', value: 'free-spins' },
+      { label: 'Balance', value: 'real-money' },
+      // { label: 'Free Spins', value: 'free-spins' },
     ]
   }
 
@@ -178,6 +206,8 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                     name='name'
                     type='text'
                     placeholder='Enter bonus title'
+                    error={!!formState.errors.name}
+                    errorMessage={formState.errors.name?.message as string}
                   />
                 )}
               />
@@ -211,6 +241,8 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                     {...field}
                     placeholder='Enter bonus description'
                     rows={3}
+                    error={!!formState.errors.description}
+                    hint={formState.errors.description?.message as string}
                   />
                 )}
               />
@@ -231,7 +263,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                 )}
               />
             </div>
-            <div>
+            {/* <div>
               <Label>Eligibility</Label>
               <Controller
                 name='eligibility'
@@ -248,15 +280,15 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                   />
                 )}
               />
-            </div>
+            </div> */}
 
-            <div className='md:col-span-2'>
+            {/* <div className='md:col-span-2'>
               <ImageUpload
                 name='bannerImage'
                 label='Bonus Banner'
                 description='Upload an image for the bonus banner (recommended: 400x200px)'
               />
-            </div>
+            </div> */}
           </div>
         </ComponentCard>
 
@@ -272,32 +304,48 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                   <Select
                     {...field}
                     value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value)
+                      setValue('defaultWageringMultiplier', 0, {
+                        shouldDirty: true,
+                      })
+                    }}
                     options={getRewardTypeOptions()}
                     placeholder='Select reward type'
                   />
                 )}
               />
             </div>
-            <div>
-              <Label>Wagering Multiplier</Label>
-              <Controller
-                name='defaultWageringMultiplier'
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type='number'
-                    placeholder='Enter wagering multiplier'
-                  />
-                )}
-              />
-            </div>
+            {watchedRewardType === 'bonus' && (
+              <div>
+                <Label>Wagering Multiplier</Label>
+                <Controller
+                  name='defaultWageringMultiplier'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      onBlur={field.onBlur}
+                      error={!!formState.errors.defaultWageringMultiplier}
+                      errorMessage={
+                        formState.errors.defaultWageringMultiplier
+                          ?.message as string
+                      }
+                      type='number'
+                      placeholder='Enter wagering multiplier'
+                    />
+                  )}
+                />
+              </div>
+            )}
           </div>
 
           {/* Conditional reward configurations */}
           <div className='mt-6'>
             <FreespinConfig game={null} control={control} />
             <RealMoneyConfig control={control} />
+            <BonusConfig control={control} />
           </div>
         </ComponentCard>
 
