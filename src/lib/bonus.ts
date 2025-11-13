@@ -65,7 +65,7 @@ export const bonusFormSchema = z
     rewardType: z.enum(['real-money', 'free-spins', 'bonus']),
     defaultWageringMultiplier: z
       .number()
-      .min(1, 'Wager amount is required')
+      .min(0, 'Wager amount is required')
       .default(35),
 
     // Real Money Reward Configuration

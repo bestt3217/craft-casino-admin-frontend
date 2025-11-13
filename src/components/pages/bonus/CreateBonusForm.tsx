@@ -49,7 +49,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
       type: BonusType.DEPOSIT,
       status: BonusStatus.DRAFT,
       eligibility: BonusEligibility.ALL,
-      rewardType: 'real-money',
+      rewardType: 'bonus',
       defaultWageringMultiplier: 0,
       bannerImage: '',
       cash: {
@@ -75,6 +75,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
   const { handleSubmit, setValue, watch, control, formState } = methods
   const watchedRewardType = watch('rewardType')
 
+  console.warn('formState.errors', formState.errors)
   const onSubmit = async (data: BonusFormValues) => {
     setIsLoading(true)
     try {
@@ -174,13 +175,13 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
       ]
     } else if (selectedBonusType === BonusType.DEPOSIT) {
       return [
-        { label: 'Real Money', value: 'real-money' },
+        // { label: 'Real Money', value: 'real-money' },
         { label: 'Bonus', value: 'bonus' },
         // { label: 'Free Spins', value: 'free-spins' },
       ]
     }
     return [
-      { label: 'Balance', value: 'real-money' },
+      { label: 'Real Money', value: 'real-money' },
       // { label: 'Free Spins', value: 'free-spins' },
     ]
   }
