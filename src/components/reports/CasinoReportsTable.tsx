@@ -4,6 +4,8 @@ import moment from 'moment'
 import Image from 'next/image'
 import React from 'react'
 
+import { useI18n } from '@/context/I18nContext'
+
 import { formatNumber } from '@/lib/utils'
 
 import { Skeleton } from '@/components/common/Skeleton'
@@ -33,6 +35,8 @@ const CasinoReportsTable = ({
   setPage,
   isLoading,
 }: CasinoReportsTableProps) => {
+  const { t } = useI18n()
+
   const formatCurrency = (amount: number) => {
     return `₺ ${formatNumber(Number(amount.toFixed(2)))}`
   }
@@ -54,61 +58,61 @@ const CasinoReportsTable = ({
                         isHeader
                         className='text-theme-xs px-5 py-3 text-left font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Username
+                        {t('users.username')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Email
+                        {t('common.email')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Total Bet Amount
+                        {t('reports.totalBetAmount')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Total Win Amount
+                        {t('reports.totalWinAmount')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Total GGR
+                        {t('reports.totalGGR')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Bet Count
+                        {t('reports.betCount')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Win Count
+                        {t('reports.winCount')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Avg Bet
+                        {t('reports.avgBet')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        First Transaction
+                        {t('reports.firstTransaction')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Last Transaction
+                        {t('reports.lastTransaction')}
                       </TableCell>
                     </TableRow>
                   </TableHeader>
@@ -172,7 +176,7 @@ const CasinoReportsTable = ({
                       <TableRow>
                         <TableCell colSpan={11} className='text-center'>
                           <p className='py-8 text-gray-500 dark:text-gray-400'>
-                            No records found
+                            {t('reports.noRecordsFound')}
                           </p>
                         </TableCell>
                       </TableRow>

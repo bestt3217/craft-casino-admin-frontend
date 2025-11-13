@@ -1,10 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 
 import { getCasinoReports } from '@/api/reports'
+
+import { useI18n } from '@/context/I18nContext'
 
 import { formatNumber } from '@/lib/utils'
 
@@ -24,27 +26,34 @@ type SortByOption =
   | 'winCount'
   | 'lastTxnAt'
 
-const SORT_BY_OPTIONS = [
-  { value: 'totalBetAmount', label: 'Total Bet Amount' },
-  { value: 'totalWinAmount', label: 'Total Win Amount' },
-  { value: 'totalGGR', label: 'Total GGR' },
-  { value: 'betCount', label: 'Bet Count' },
-  { value: 'winCount', label: 'Win Count' },
-  { value: 'lastTxnAt', label: 'Last Transaction' },
-]
-
-const SORT_DIR_OPTIONS = [
-  { value: 'desc', label: 'Descending' },
-  { value: 'asc', label: 'Ascending' },
-]
-
 const CasinoReports = () => {
+  const { t } = useI18n()
   const [range, setRange] = useState<DateRange | undefined>(undefined)
   const [reports, setReports] = useState<CasinoReportsResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [sortBy, setSortBy] = useState<SortByOption>('totalBetAmount')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+
+  const SORT_BY_OPTIONS = useMemo(
+    () => [
+      { value: 'totalBetAmount', label: t('reports.totalBetAmount') },
+      { value: 'totalWinAmount', label: t('reports.totalWinAmount') },
+      { value: 'totalGGR', label: t('reports.totalGGR') },
+      { value: 'betCount', label: t('reports.betCount') },
+      { value: 'winCount', label: t('reports.winCount') },
+      { value: 'lastTxnAt', label: t('reports.lastTransaction') },
+    ],
+    [t]
+  )
+
+  const SORT_DIR_OPTIONS = useMemo(
+    () => [
+      { value: 'desc', label: t('reports.descending') },
+      { value: 'asc', label: t('reports.ascending') },
+    ],
+    [t]
+  )
 
   const formatCurrency = (amount: number) => {
     return `TRY ₺ ${formatNumber(Number(amount.toFixed(2)))}`
@@ -71,12 +80,12 @@ const CasinoReports = () => {
         setReports(response)
       }
     } catch {
-      toast.error('Failed to fetch casino reports')
+      toast.error(t('reports.failedToFetchCasinoReports'))
       setReports(null)
     } finally {
       setIsLoading(false)
     }
-  }, [range, page, sortBy, sortDir])
+  }, [range, page, sortBy, sortDir, t])
 
   useEffect(() => {
     fetchReports()
@@ -106,8 +115,8 @@ const CasinoReports = () => {
   return (
     <div className='space-y-6'>
       <ComponentCard
-        title='Casino Reports'
-        desc='View detailed casino reports by date range'
+        title={t('reports.casinoReports')}
+        desc={t('reports.viewDetailedCasinoReports')}
         action={<DateRangeSelector value={range} onChange={setRange} />}
       >
         {reports && (
@@ -115,19 +124,19 @@ const CasinoReports = () => {
             {/* Totals Cards */}
             <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
               <MetricsCard
-                title='Total Bet Amount'
+                title={t('reports.totalBetAmount')}
                 value={formatCurrency(reports.totals.totalBetAmount)}
-                tooltipText='Sum of all bets placed by players'
+                tooltipText={t('reports.sumOfAllBetsPlaced')}
               />
               <MetricsCard
-                title='Total Win Amount'
+                title={t('reports.totalWinAmount')}
                 value={formatCurrency(reports.totals.totalWinAmount)}
-                tooltipText='Sum of all winnings paid to players'
+                tooltipText={t('reports.sumOfAllWinningsPaid')}
               />
               <MetricsCard
-                title='Total GGR'
+                title={t('reports.totalGGR')}
                 value={formatCurrency(reports.totals.totalGGR)}
-                tooltipText='Gross Gaming Revenue (Total Bet - Total Win)'
+                tooltipText={t('reports.grossGamingRevenue')}
               />
             </div>
 
@@ -135,12 +144,12 @@ const CasinoReports = () => {
             <div className='rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-white/[0.05] dark:bg-white/[0.02]'>
               <div className='flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400'>
                 <span>
-                  <strong>Total Users:</strong>{' '}
+                  <strong>{t('reports.totalUsers')}</strong>{' '}
                   {formatNumber(reports.meta.totalUsers)}
                 </span>
                 <span>
-                  <strong>Page:</strong> {reports.meta.page} of{' '}
-                  {reports.meta.totalPages}
+                  <strong>{t('common.page')}:</strong> {reports.meta.page}{' '}
+                  {t('common.of')} {reports.meta.totalPages}
                 </span>
               </div>
             </div>
@@ -149,7 +158,7 @@ const CasinoReports = () => {
             <div className='flex flex-wrap items-center gap-4'>
               <div className='flex items-center gap-2'>
                 <label className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Sort By:
+                  {t('reports.sortBy')}
                 </label>
                 <Select
                   options={SORT_BY_OPTIONS}
@@ -160,7 +169,7 @@ const CasinoReports = () => {
               </div>
               <div className='flex items-center gap-2'>
                 <label className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Order:
+                  {t('reports.order')}
                 </label>
                 <Select
                   options={SORT_DIR_OPTIONS}
@@ -176,7 +185,7 @@ const CasinoReports = () => {
 
       {/* Reports Table */}
       {reports && (
-        <ComponentCard title='User Reports'>
+        <ComponentCard title={t('reports.userReports')}>
           <CasinoReportsTable
             data={reports.data}
             totalPages={reports.meta.totalPages}
@@ -190,7 +199,7 @@ const CasinoReports = () => {
       {!reports && !isLoading && range && (
         <div className='rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-white/[0.05] dark:bg-white/[0.03]'>
           <p className='text-gray-500 dark:text-gray-400'>
-            Select a date range to view casino reports
+            {t('reports.selectDateRangeToViewReports')}
           </p>
         </div>
       )}
