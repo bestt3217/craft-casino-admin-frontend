@@ -2,6 +2,8 @@
 import moment from 'moment'
 import React from 'react'
 
+import { useI18n } from '@/context/I18nContext'
+
 import { formatNumber } from '@/lib/utils'
 
 import Loading from '@/components/common/Loading'
@@ -45,6 +47,7 @@ export default function UsersTable({
   // onMuteStatusChange,
   onBalanceChange,
 }: UsersTableProps) {
+  const { t } = useI18n()
   const [openStatusDropdown, setOpenStatusDropdown] = React.useState<
     string | null
   >(null)
@@ -112,49 +115,49 @@ export default function UsersTable({
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      User
+                      {t('common.user')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Full Name
+                      {t('users.fullName')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Email
+                      {t('common.email')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Turkey ID
+                      {t('users.turkeyId')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Phone Number
+                      {t('users.phoneNumber')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Rank
+                      {t('users.rank')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Level
+                      {t('users.level')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Balance
+                      {t('users.balance')}
                     </TableCell>
                     {/* <TableCell
                       isHeader
@@ -166,37 +169,37 @@ export default function UsersTable({
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Email Verified
+                      {t('users.emailVerified')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Banned Status
+                      {t('users.bannedStatus')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Last Login IP
+                      {t('users.lastLoginIp')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Last Login Location
+                      {t('users.lastLoginLocation')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Last Login At
+                      {t('users.lastLoginAt')}
                     </TableCell>
                     <TableCell
                       isHeader
                       className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                     >
-                      Member Since
+                      {t('users.memberSince')}
                     </TableCell>
                   </TableRow>
                 </TableHeader>
@@ -246,7 +249,7 @@ export default function UsersTable({
                                 }}
                                 className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                               >
-                                Change password
+                                {t('users.changePassword')}
                               </DropdownItem>
                             </Dropdown>
                           </div>
@@ -292,7 +295,7 @@ export default function UsersTable({
                                   }}
                                   className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                                 >
-                                  Add Balance
+                                  {t('users.addBalance')}
                                 </DropdownItem>
                               </Dropdown>
                             </div>
@@ -352,8 +355,8 @@ export default function UsersTable({
                           >
                             <span className='whitespace-nowrap'>
                               {row.isEmailVerified
-                                ? 'Verified'
-                                : 'Not Verified'}
+                                ? t('users.verified')
+                                : t('users.notVerified')}
                             </span>
                           </Badge>
                         </TableCell>
@@ -368,8 +371,11 @@ export default function UsersTable({
                                 <Badge
                                   size='sm'
                                   color={row.isBanned ? 'error' : 'success'}
+                                  className='whitespace-nowrap'
                                 >
-                                  {row.isBanned ? 'Banned' : 'Allowed'}
+                                  {row.isBanned
+                                    ? t('users.banned')
+                                    : t('users.allowed')}
                                 </Badge>
                                 <MoreDotIcon className='text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' />
                               </button>
@@ -385,7 +391,7 @@ export default function UsersTable({
                                   }}
                                   className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                                 >
-                                  Ban User
+                                  {t('users.banUser')}
                                 </DropdownItem>
                                 <DropdownItem
                                   onItemClick={() => {
@@ -394,22 +400,22 @@ export default function UsersTable({
                                   }}
                                   className='flex w-full rounded-lg text-left font-normal whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300'
                                 >
-                                  Allow User
+                                  {t('users.allowUser')}
                                 </DropdownItem>
                               </Dropdown>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
-                          {row.lastLoginIp || 'N/A'}
+                          {row.lastLoginIp || t('common.na')}
                         </TableCell>
                         <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
-                          {row.lastLoginCountry || 'N/A'}
+                          {row.lastLoginCountry || t('common.na')}
                         </TableCell>
                         <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           {row.lastLoginTime
                             ? moment(row.lastLoginTime).format('YYYY-MM-DD')
-                            : 'N/A'}
+                            : t('common.na')}
                         </TableCell>
                         <TableCell className='text-theme-sm px-4 py-3 text-center whitespace-nowrap text-gray-500 dark:text-gray-400'>
                           {moment(row.createdAt).format('YYYY-MM-DD')}
