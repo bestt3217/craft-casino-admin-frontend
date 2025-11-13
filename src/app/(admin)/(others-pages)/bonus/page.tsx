@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { getBonuses } from '@/api/bonus'
 import { getTiers } from '@/api/tier'
 
+import { useI18n } from '@/context/I18nContext'
+
 import ComponentCard from '@/components/common/ComponentCard'
 import Loading from '@/components/common/Loading'
 import BonusTable from '@/components/pages/bonus/BonusTable'
@@ -18,6 +20,7 @@ import { Bonus } from '@/types/bonus'
 import { ITierData } from '@/types/tier'
 
 const BonusManagementPage = () => {
+  const { t } = useI18n()
   const [loyaltyTiers, setLoyaltyTiers] = useState<ITierData[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [page, setPage] = useState<number>(1)
@@ -40,10 +43,10 @@ const BonusManagementPage = () => {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error fetching bonuses')
+        toast.error(t('bonus.errorFetchingBonuses'))
       }
     }
-  }, [page, limit])
+  }, [page, limit, t])
 
   const fetchLoyaltyTiers = useCallback(async () => {
     try {
@@ -56,10 +59,10 @@ const BonusManagementPage = () => {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error fetching loyalty tiers')
+        toast.error(t('bonus.errorFetchingLoyaltyTiers'))
       }
     }
-  }, [])
+  }, [t])
 
   const initialLoading = useCallback(async () => {
     await Promise.all([fetchLoyaltyTiers(), fetchBonuses()])
@@ -80,11 +83,11 @@ const BonusManagementPage = () => {
 
   return (
     <ComponentCard
-      title='Bonus management'
+      title={t('bonus.bonusManagement')}
       action={
         <Button onClick={() => router.push('/bonus/create')} size='xs'>
           <PlusIcon />
-          Add Bonus
+          {t('bonus.addBonus')}
         </Button>
       }
     >

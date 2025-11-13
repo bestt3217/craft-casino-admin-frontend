@@ -160,65 +160,72 @@ export default function BonusTable({
     const eligibility = bonus.metadata?.eligibility || BonusEligibility.ALL
     return {
       text:
-        eligibility === BonusEligibility.UTM ? 'UTM Marketing' : 'All Users',
+        eligibility === BonusEligibility.UTM
+          ? t('bonus.utmMarketing')
+          : t('bonus.allUsers'),
       color: getEligibilityBadgeColor(eligibility),
     }
   }
 
-  const getAmount = useCallback((bonus: Bonus) => {
-    const reward = bonus?.defaultReward
-    let displayText = ''
+  const getAmount = useCallback(
+    (bonus: Bonus) => {
+      const reward = bonus?.defaultReward
+      let displayText = ''
 
-    // Handle cash rewards
-    if (reward?.cash) {
-      if (reward.cash.percentage) {
-        displayText = `${reward.cash.percentage}%`
-        if (reward.cash.minAmount && reward.cash.maxAmount) {
-          displayText += ` of ${reward.cash.minAmount} - ${reward.cash.maxAmount}`
-        } else if (reward.cash.minAmount) {
-          displayText += ` of ${reward.cash.minAmount}`
-        } else if (reward.cash.maxAmount) {
-          displayText += ` of ${reward.cash.maxAmount}`
+      // Handle cash rewards
+      if (reward?.cash) {
+        if (reward.cash.percentage) {
+          displayText = `${reward.cash.percentage}%`
+          if (reward.cash.minAmount && reward.cash.maxAmount) {
+            displayText += ` of ${reward.cash.minAmount} - ${reward.cash.maxAmount}`
+          } else if (reward.cash.minAmount) {
+            displayText += ` of ${reward.cash.minAmount}`
+          } else if (reward.cash.maxAmount) {
+            displayText += ` of ${reward.cash.maxAmount}`
+          }
+        } else if (reward.cash.amount) {
+          displayText = `${t('bonus.fixed')} ${reward.cash.amount}`
+        } else if (reward.cash.minAmount && reward.cash.maxAmount) {
+          if (reward.cash.minAmount === reward.cash.maxAmount) {
+            displayText = `${t('bonus.fixed')} ${reward.cash.minAmount}`
+          } else {
+            displayText = `${t('bonus.random')} ${reward.cash.minAmount} - ${reward.cash.maxAmount}`
+          }
         }
-      } else if (reward.cash.amount) {
-        displayText = `Fixed ${reward.cash.amount}`
-      } else if (reward.cash.minAmount && reward.cash.maxAmount) {
-        if (reward.cash.minAmount === reward.cash.maxAmount) {
-          displayText = `Fixed ${reward.cash.minAmount}`
-        } else {
-          displayText = `Random ${reward.cash.minAmount} - ${reward.cash.maxAmount}`
+      }
+
+      // Handle free spins
+      if (reward?.freeSpins) {
+        const freeSpinsText = reward.freeSpins.amount
+          ? `${reward.freeSpins.amount} ${t('bonus.freeSpins')}`
+          : reward.freeSpins.percentage
+            ? `${reward.freeSpins.percentage}% ${t('bonus.freeSpins')}`
+            : ''
+        if (freeSpinsText) {
+          displayText = displayText
+            ? `${displayText} + ${freeSpinsText}`
+            : freeSpinsText
         }
       }
-    }
 
-    // Handle free spins
-    if (reward?.freeSpins) {
-      const freeSpinsText = reward.freeSpins.amount
-        ? `${reward.freeSpins.amount} Free Spins`
-        : reward.freeSpins.percentage
-          ? `${reward.freeSpins.percentage}% Free Spins`
-          : ''
-      if (freeSpinsText) {
-        displayText = displayText
-          ? `${displayText} + ${freeSpinsText}`
-          : freeSpinsText
+      // Handle bonus rewards
+      if (reward?.bonus) {
+        const bonusText = reward.bonus.amount
+          ? `${reward.bonus.amount} ${t('bonus.bonus')}`
+          : reward.bonus.percentage
+            ? `${reward.bonus.percentage}% ${t('bonus.bonus')}`
+            : ''
+        if (bonusText) {
+          displayText = displayText
+            ? `${displayText} + ${bonusText}`
+            : bonusText
+        }
       }
-    }
 
-    // Handle bonus rewards
-    if (reward?.bonus) {
-      const bonusText = reward.bonus.amount
-        ? `${reward.bonus.amount} Bonus`
-        : reward.bonus.percentage
-          ? `${reward.bonus.percentage}% Bonus`
-          : ''
-      if (bonusText) {
-        displayText = displayText ? `${displayText} + ${bonusText}` : bonusText
-      }
-    }
-
-    return displayText || 'N/A'
-  }, [])
+      return displayText || t('common.na')
+    },
+    [t]
+  )
 
   return (
     <>
@@ -237,61 +244,61 @@ export default function BonusTable({
                         isHeader
                         className='text-theme-xs px-5 py-3 text-left font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Title
+                        {t('bonus.title')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-left font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Type
+                        {t('bonus.type')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-left font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Amount
+                        {t('bonus.amount')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Eligibility
+                        {t('bonus.eligibility')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Banner
+                        {t('bonus.banner')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Claim Method
+                        {t('bonus.claimMethod')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Valid From
+                        {t('bonus.validFrom')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Valid To
+                        {t('bonus.validTo')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Status
+                        {t('bonus.status')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Actions
+                        {t('bonus.actions')}
                       </TableCell>
                     </TableRow>
                   </TableHeader>
@@ -342,7 +349,7 @@ export default function BonusTable({
                               </div>
                             ) : (
                               <span className='text-xs text-gray-400'>
-                                No image
+                                {t('bonus.noImage')}
                               </span>
                             )}
                           </TableCell>
@@ -358,19 +365,21 @@ export default function BonusTable({
                           <TableCell className='text-theme-sm cursor-default px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                             {bonus.validFrom
                               ? formatDate(bonus.validFrom)
-                              : 'N/A'}
+                              : t('common.na')}
                           </TableCell>
                           <TableCell className='text-theme-sm cursor-default px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                             {bonus.validTo
                               ? formatDate(bonus.validTo)
-                              : 'No Expiry'}
+                              : t('bonus.noExpiry')}
                           </TableCell>
                           <TableCell className='text-theme-sm cursor-default px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
                             <Badge
                               size='sm'
                               color={getBadgeColor(bonus.status)}
                             >
-                              <span className='capitalize'>{bonus.status}</span>
+                              <span className='capitalize'>
+                                {t(`bonus.${bonus.status.toLowerCase()}`)}
+                              </span>
                             </Badge>
                           </TableCell>
                           <TableCell className='text-theme-sm px-4 py-3 text-center text-gray-500 dark:text-gray-400'>
@@ -401,7 +410,7 @@ export default function BonusTable({
                       <TableRow>
                         <TableCell colSpan={10} className='text-center'>
                           <p className='py-2 text-gray-500 dark:text-gray-400'>
-                            No bonuses found
+                            {t('bonus.noBonusesFound')}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -420,8 +429,8 @@ export default function BonusTable({
             </div>
             <ConfirmModal
               open={openConfirm}
-              title='Are you Sure?'
-              description='You can not restore deleted bonus.'
+              title={t('common.areYouSure')}
+              description={t('bonus.cannotRestoreDeletedBonus')}
               handleConfirm={() => handleDelete(deleteId)}
               handleClose={handleClose}
             />
