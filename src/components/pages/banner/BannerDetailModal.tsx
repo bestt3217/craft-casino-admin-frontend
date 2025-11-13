@@ -8,9 +8,11 @@ import { toast } from 'sonner'
 
 import { uploadPromotionImage } from '@/api/promotion'
 
+import { useI18n } from '@/context/I18nContext'
+
 import {
-  bannerFormSchema,
   BannerFormValues,
+  createBannerFormSchema,
   deviceOptions,
   languageOptions,
   sectionOptions,
@@ -38,11 +40,13 @@ const BannerDetailModal = ({
   detail?: IBannerData
   onSubmit: (data: BannerFormValues) => Promise<boolean>
 }) => {
+  const { t } = useI18n()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const bannerImageRef = useRef<HTMLInputElement>(null)
   const [image, setImageUrl] = useState<string | null>(null)
   const [detailInfo, setDetailInfo] = useState<IBannerData | null>(null)
   const [fileToUpload, setFileToUpload] = useState<File | null>(null)
+  const bannerFormSchema = React.useMemo(() => createBannerFormSchema(t), [t])
   const {
     control,
     handleSubmit,
@@ -155,7 +159,7 @@ const BannerDetailModal = ({
       }
     } catch (error) {
       console.error('Error submitting promotion:', error)
-      toast.error('Failed to save promotion')
+      toast.error(t('banner.failedToSavePromotion'))
     } finally {
       setIsLoading(false)
     }
@@ -207,7 +211,9 @@ const BannerDetailModal = ({
             <div>
               <div className='mb-5 px-2 pr-14'>
                 <h4 className='text-2xl font-semibold text-gray-800 dark:text-white/90'>
-                  {detailInfo?._id ? 'Update' : 'Add'} Banner
+                  {detailInfo?._id
+                    ? t('banner.updateBanner')
+                    : t('banner.addBanner')}
                 </h4>
               </div>
               <div className='m-auto my-2 flex h-auto flex-col rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]'>
@@ -241,14 +247,14 @@ const BannerDetailModal = ({
                 <div className='grid grid-cols-1 space-y-1 pb-4'>
                   {/* Title */}
                   <div>
-                    <Label>Title</Label>
+                    <Label>{t('banner.title')}</Label>
                     <Controller
                       name='title'
                       control={control}
                       render={({ field }) => (
                         <Input
                           type='text'
-                          placeholder='Name'
+                          placeholder={t('banner.enterTitle')}
                           value={field.value}
                           onChange={field.onChange}
                           error={Boolean(errors.title?.message)}
@@ -259,14 +265,14 @@ const BannerDetailModal = ({
                   </div>
                   {/* Position */}
                   <div>
-                    <Label>Position</Label>
+                    <Label>{t('banner.position')}</Label>
                     <Controller
                       name='position'
                       control={control}
                       render={({ field }) => (
                         <Input
                           type='text'
-                          placeholder='Name'
+                          placeholder={t('banner.enterPosition')}
                           value={field.value}
                           onChange={field.onChange}
                           error={Boolean(errors.position?.message)}
@@ -277,7 +283,7 @@ const BannerDetailModal = ({
                   </div>
                   {/* Language */}
                   <div>
-                    <Label>Language</Label>
+                    <Label>{t('banner.language')}</Label>
                     <Controller
                       name='language'
                       control={control}
@@ -292,6 +298,7 @@ const BannerDetailModal = ({
                               value: code, // language code as value
                               label: name, // language name as label
                             }))}
+                            placeholder={t('banner.selectLanguage')}
                             defaultValue={
                               selectedOption ? selectedOption.code : ''
                             }
@@ -310,7 +317,7 @@ const BannerDetailModal = ({
                   </div>
                   {/* Device */}
                   <div>
-                    <Label>Device</Label>
+                    <Label>{t('banner.device')}</Label>
                     <Controller
                       name='device'
                       control={control}
@@ -318,6 +325,7 @@ const BannerDetailModal = ({
                         <Select
                           {...field}
                           defaultValue={field.value || ''}
+                          placeholder={t('banner.selectDevice')}
                           options={deviceOptions}
                           error={Boolean(errors.device?.message)}
                           errorMessage={errors.device?.message || ''}
@@ -328,7 +336,7 @@ const BannerDetailModal = ({
 
                   {/* Section */}
                   <div>
-                    <Label>Section</Label>
+                    <Label>{t('banner.section')}</Label>
                     <Controller
                       name='section'
                       control={control}
@@ -336,6 +344,7 @@ const BannerDetailModal = ({
                         <Select
                           {...field}
                           defaultValue={field.value || ''}
+                          placeholder={t('banner.selectSection')}
                           options={sectionOptions}
                           error={Boolean(errors.section?.message)}
                           errorMessage={errors.section?.message || ''}
@@ -355,9 +364,9 @@ const BannerDetailModal = ({
                   {isLoading ? (
                     <LoadingSpinner className='mx-auto size-5' />
                   ) : detailInfo?._id ? (
-                    'Update'
+                    t('common.update')
                   ) : (
-                    'Save'
+                    t('common.save')
                   )}
                 </Button>
               </div>

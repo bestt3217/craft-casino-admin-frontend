@@ -1,67 +1,91 @@
 import { z } from 'zod'
 
-export const bannerFormSchema = z.object({
-  title: z.string().min(1, 'Title is required'), // Title is required and cannot be empty
-  image: z.string().optional().nullable(), // Image URL is required
-  position: z.string().min(1, 'Position is required'), // Position is required
-  language: z
-    .object({
-      code: z
-        .enum(['en', 'es', 'fr', 'tk', 'de', 'it', 'ar', 'pt', 'zh'])
-        .optional()
-        .nullable(),
-      name: z
-        .enum(
-          [
-            'English',
-            'Turkish',
-            'Spanish',
-            'French',
-            'German',
-            'Italian',
-            'Arabic',
-            'Portuguese',
-            'Chinese',
-          ],
-          {
-            errorMap: () => ({ message: 'Invalid language name' }),
-          }
-        )
-        .optional()
-        .nullable(),
-    })
-    .optional()
-    .nullable(),
+export const createBannerFormSchema = (t?: (key: string) => string) => {
+  const translate = (key: string, fallback: string) => (t ? t(key) : fallback)
 
-  device: z.enum(['mobile', 'desktop', 'tablet', 'smartwatch'], {
-    errorMap: () => ({ message: 'Invalid device type' }), // Ensure device is one of the valid options
-  }),
-  section: z.enum(
-    [
-      'home',
-      'promotions',
-      'games',
-      'sports',
-      'casino',
-      'bonuses',
-      'responsible-gambling',
-      'new-user-registration',
-      'payment-methods',
-      'mobile-app',
-      'live-betting',
-      'vip-program',
-      'events',
-      'affiliate',
-      'blog-news',
-      'footer',
-    ],
-    {
-      errorMap: () => ({ message: 'Invalid section type' }), // Ensure section is one of the valid options
-    }
-  ),
-})
+  return z.object({
+    title: z
+      .string()
+      .min(1, translate('banner.titleRequired', 'Title is required')), // Title is required and cannot be empty
+    image: z.string().optional().nullable(), // Image URL is required
+    position: z
+      .string()
+      .min(1, translate('banner.positionRequired', 'Position is required')), // Position is required
+    language: z
+      .object({
+        code: z
+          .enum(['en', 'es', 'fr', 'tk', 'de', 'it', 'ar', 'pt', 'zh'])
+          .optional()
+          .nullable(),
+        name: z
+          .enum(
+            [
+              'English',
+              'Turkish',
+              'Spanish',
+              'French',
+              'German',
+              'Italian',
+              'Arabic',
+              'Portuguese',
+              'Chinese',
+            ],
+            {
+              errorMap: () => ({
+                message: translate(
+                  'banner.invalidLanguageName',
+                  'Invalid language name'
+                ),
+              }),
+            }
+          )
+          .optional()
+          .nullable(),
+      })
+      .optional()
+      .nullable(),
 
-export type BannerFormValues = z.infer<typeof bannerFormSchema>
+    device: z.enum(['mobile', 'desktop', 'tablet', 'smartwatch'], {
+      errorMap: () => ({
+        message: translate('banner.invalidDeviceType', 'Invalid device type'),
+      }), // Ensure device is one of the valid options
+    }),
+    section: z.enum(
+      [
+        'home',
+        'promotions',
+        'games',
+        'sports',
+        'casino',
+        'bonuses',
+        'responsible-gambling',
+        'new-user-registration',
+        'payment-methods',
+        'mobile-app',
+        'live-betting',
+        'vip-program',
+        'events',
+        'affiliate',
+        'blog-news',
+        'footer',
+      ],
+      {
+        errorMap: () => ({
+          message: translate(
+            'banner.invalidSectionType',
+            'Invalid section type'
+          ),
+        }), // Ensure section is one of the valid options
+      }
+    ),
+  })
+}
+
+export const bannerFormSchema = createBannerFormSchema()
+
+export type BannerFormValues = z.infer<
+  ReturnType<typeof createBannerFormSchema>
+>
 
 export const languageOptions = [
   { code: 'en', name: 'English' },

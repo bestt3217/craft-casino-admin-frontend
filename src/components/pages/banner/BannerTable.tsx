@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 
 import { deleteBanner } from '@/api/banner'
 
+import { useI18n } from '@/context/I18nContext'
+
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loading from '@/components/common/Loading'
 import Pagination from '@/components/tables/Pagination'
@@ -41,6 +43,7 @@ export default function BannerTable({
   fetchBanners,
   onEdit,
 }: BannerTableProps) {
+  const { t } = useI18n()
   const [openConfirm, setOpenConfirm] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<string>('')
 
@@ -52,7 +55,7 @@ export default function BannerTable({
       setIsLoading(true)
       const res = await deleteBanner(id)
       if (res.success) {
-        toast.success('Tier deleted successfully')
+        toast.success(t('banner.bannerDeletedSuccessfully'))
         fetchBanners()
       }
     } catch (error) {
@@ -84,7 +87,7 @@ export default function BannerTable({
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Title
+                        {t('banner.title')}
                       </TableCell>
                       <TableCell
                         isHeader
@@ -94,31 +97,31 @@ export default function BannerTable({
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Position
+                        {t('banner.position')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        language
+                        {t('banner.language')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Device
+                        {t('banner.device')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Section
+                        {t('banner.section')}
                       </TableCell>
                       <TableCell
                         isHeader
                         className='text-theme-xs px-5 py-3 text-center font-medium text-gray-500 dark:text-gray-400'
                       >
-                        Actions
+                        {t('banner.actions')}
                       </TableCell>
                     </TableRow>
                   </TableHeader>
@@ -187,9 +190,9 @@ export default function BannerTable({
                       })}
                     {bannerData.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className='text-center'>
+                        <TableCell colSpan={7} className='text-center'>
                           <p className='py-2 text-gray-500 dark:text-gray-400'>
-                            No data found
+                            {t('banner.noDataFound')}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -208,8 +211,8 @@ export default function BannerTable({
             </div>
             <ConfirmModal
               open={openConfirm}
-              title='Are you Sure?'
-              description='You can not restore deleted record.'
+              title={t('common.areYouSure')}
+              description={t('common.thisActionCannotBeUndone')}
               handleConfirm={() => {
                 handleDelete(deleteId)
               }}

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { createBanner, getBanners, updateBanner } from '@/api/banner'
 
 import { useI18n } from '@/context/I18nContext'
+
 import { BannerFormValues, sectionOptions } from '@/lib/banner'
 import { useModal } from '@/hooks/useModal'
 
@@ -102,7 +103,10 @@ export default function BannerListPage() {
           title={t('banner.banners')}
           inputSearchElement={
             <Select
-              options={[{ value: 'all', label: t('common.all') }, ...sectionOptions]}
+              options={[
+                { value: 'all', label: t('common.all') },
+                ...sectionOptions,
+              ]}
               placeholder={t('banner.selectSection')}
               onChange={fetchBanners}
             />
