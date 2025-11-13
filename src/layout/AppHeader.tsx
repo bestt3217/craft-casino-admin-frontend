@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { useSidebar } from '@/context/SidebarContext'
 
+import LanguageSelector from '@/components/common/LanguageSelector'
 import UserDropdown from '@/components/header/UserDropdown'
 
 const AppHeader: React.FC = () => {
@@ -166,6 +167,10 @@ const AppHeader: React.FC = () => {
             {/* <!-- Dark Mode Toggler --> */}
             {/* <ThemeToggleButton /> */}
             {/* <!-- Dark Mode Toggler --> */}
+
+            {/* <!-- Language Selector --> */}
+            <LanguageSelector />
+            {/* <!-- Language Selector --> */}
 
             {/* <NotificationDropdown />  */}
             {/* <!-- Notification Menu Area --> */}

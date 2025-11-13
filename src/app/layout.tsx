@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import './globals.css'
 
 import { AuthProvider } from '@/context/AuthContext'
+import { I18nProvider } from '@/context/I18nContext'
 import { PermissionProvider } from '@/context/PermissionContext'
 import { SidebarProvider } from '@/context/SidebarContext'
 import { ThemeProvider } from '@/context/ThemeContext'
@@ -30,13 +31,15 @@ export default function RootLayout({
     <html lang='en' className='dark'>
       <body className={`${outfit.variable} dark:bg-gray-900`}>
         <Suspense>
-          <AuthProvider>
-            <PermissionProvider>
-              <ThemeProvider>
-                <SidebarProvider>{children}</SidebarProvider>
-              </ThemeProvider>
-            </PermissionProvider>
-          </AuthProvider>
+          <I18nProvider>
+            <AuthProvider>
+              <PermissionProvider>
+                <ThemeProvider>
+                  <SidebarProvider>{children}</SidebarProvider>
+                </ThemeProvider>
+              </PermissionProvider>
+            </AuthProvider>
+          </I18nProvider>
         </Suspense>
         <Toaster richColors position='top-right' />
       </body>

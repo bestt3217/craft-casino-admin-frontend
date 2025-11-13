@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { deleteBonus } from '@/api/bonus'
 
+import { useI18n } from '@/context/I18nContext'
 import {
   BonusEligibility,
   BonusStatus,
@@ -54,6 +55,7 @@ export default function BonusTable({
   fetchBonuses,
   onEdit,
 }: BonusTableProps) {
+  const { t } = useI18n()
   const router = useRouter()
   const [openConfirm, setOpenConfirm] = useState<boolean>(false)
   const [deleteId, setDeleteId] = useState<string>(null)
@@ -82,10 +84,10 @@ export default function BonusTable({
       setImageModal({
         isOpen: true,
         imageUrl,
-        title: `${bonusName} Banner`,
+        title: `${bonusName} ${t('bonus.banner')}`,
       })
     },
-    []
+    [t]
   )
 
   const handleBonusClick = useCallback(
@@ -101,12 +103,12 @@ export default function BonusTable({
       setIsLoading(true)
       const res = await deleteBonus(id)
       if (res.message) {
-        toast.success('Bonus deleted successfully')
+        toast.success(t('bonus.bonusDeletedSuccessfully'))
         fetchBonuses()
       }
     } catch (error) {
       console.error('Error deleting bonus:', error)
-      toast.error(error.message || 'Failed to delete bonus')
+      toast.error(error.message || t('bonus.errorDeletingBonus'))
     } finally {
       setIsLoading(false)
       setDeleteId(null)

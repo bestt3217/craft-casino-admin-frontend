@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 
 import { addUserBalance, banUser, getUsers, muteUser } from '@/api/users'
 
+import { useI18n } from '@/context/I18nContext'
+
 import ComponentCard from '@/components/common/ComponentCard'
 import { InputSearch } from '@/components/common/InputSearch'
 import UsersTable from '@/components/tables/UsersTable'
@@ -15,6 +17,7 @@ import Button from '@/components/ui/button/Button'
 import { IUserData } from '@/types/users'
 
 export default function UserListPage() {
+  const { t } = useI18n()
   const [tableData, setTableData] = useState<IUserData[]>([])
   const [page, setPage] = useState<number>(1)
   const [limit] = useState<number>(10)
@@ -51,9 +54,9 @@ export default function UserListPage() {
       if (response.success) {
         fetchUsers()
         if (status) {
-          toast.success('User banned successfully')
+          toast.success(t('users.userBannedSuccessfully'))
         } else {
-          toast.success('User unbanned successfully')
+          toast.success(t('users.userUnbannedSuccessfully'))
         }
       }
     } catch (error) {
@@ -67,9 +70,9 @@ export default function UserListPage() {
       if (response.success) {
         fetchUsers()
         if (status) {
-          toast.success('User muted successfully')
+          toast.success(t('users.userMutedSuccessfully'))
         } else {
-          toast.success('User unmuted successfully')
+          toast.success(t('users.userUnmutedSuccessfully'))
         }
       }
     } catch (error) {
@@ -85,7 +88,7 @@ export default function UserListPage() {
       })
       if (response.success) {
         fetchUsers()
-        toast.success('User balance updated successfully')
+        toast.success(t('users.userBalanceUpdatedSuccessfully'))
       }
     } catch (error) {
       console.error('Error updating user balance:', error)
@@ -162,13 +165,13 @@ export default function UserListPage() {
         link.click()
         document.body.removeChild(link)
 
-        toast.success('Users exported to CSV successfully')
+        toast.success(t('common.success'))
       } else {
-        toast.error('Failed to export users')
+        toast.error(t('common.errorOccurred'))
       }
     } catch (error) {
       console.error('Error exporting CSV:', error)
-      toast.error('An error occurred while exporting users')
+      toast.error(t('common.errorOccurred'))
     } finally {
       setIsExporting(false)
     }
@@ -176,7 +179,7 @@ export default function UserListPage() {
 
   return (
     <ComponentCard
-      title='Users'
+      title={t('navigation.users')}
       inputSearchElement={<InputSearch fetchData={fetchUsers} />}
       action={
         <Button
@@ -185,7 +188,7 @@ export default function UserListPage() {
           onClick={handleExportCSV}
           disabled={isExporting}
         >
-          <FileIcon /> {isExporting ? 'Exporting CSV...' : 'Export CSV'}
+          <FileIcon /> {isExporting ? `${t('common.loading')}` : t('common.exportCSV')}
         </Button>
       }
     >

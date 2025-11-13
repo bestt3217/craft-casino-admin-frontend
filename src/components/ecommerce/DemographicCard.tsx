@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 
 import { getAnalytics } from '@/api/metrics'
 
+import { useI18n } from '@/context/I18nContext'
+
 import { formatNumber } from '@/lib/utils'
 
 import Loading from '@/components/common/Loading'
@@ -14,6 +16,7 @@ import CountryMap from './CountryMap'
 import { IAnalytics } from '@/types/metrics'
 
 const DemographicCard = () => {
+  const { t } = useI18n()
   const [analytics, setAnalytics] = useState<IAnalytics[]>(null)
   const [isLoading, setIsLoading] = useState(false)
   const visitorCount = useMemo(() => {
@@ -32,7 +35,7 @@ const DemographicCard = () => {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error fetching analytics')
+        toast.error(t('common.errorFetchingAnalytics'))
       }
       setIsLoading(false)
     }
@@ -60,10 +63,10 @@ const DemographicCard = () => {
           <div className='flex justify-between'>
             <div>
               <h3 className='text-lg font-semibold text-gray-800 dark:text-white/90'>
-                {`Visitors Demographic (${visitorCount})`}
+                {`${t('common.visitorsDemographic')} (${visitorCount})`}
               </h3>
               <p className='text-theme-sm mt-1 text-gray-500 dark:text-gray-400'>
-                Number of visitors based on country
+                {t('common.numberOfVisitorsBasedOnCountry')}
               </p>
             </div>
           </div>
@@ -100,7 +103,7 @@ const DemographicCard = () => {
                         </p>
                         <span className='text-theme-xs block text-gray-500 dark:text-gray-400'>
                           {formatNumber(Number(row.metricValues[0].value))}{' '}
-                          Visitors
+                          {t('common.visitors')}
                         </span>
                       </div>
                     </div>

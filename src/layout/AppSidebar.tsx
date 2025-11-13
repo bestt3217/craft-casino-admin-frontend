@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useAuth } from '@/context/AuthContext'
+import { useI18n } from '@/context/I18nContext'
 
 import { useSidebar } from '../context/SidebarContext'
 import {
@@ -24,91 +25,51 @@ import {
 
 import { NavItem } from '@/types/sidebar'
 
-export const navItems: NavItem[] = [
+const getNavItems = (t: (key: string) => string): NavItem[] => [
   {
     icon: <GridIcon />,
-    name: 'Dashboard',
+    name: t('navigation.dashboard'),
     path: '/',
-    // subItems: [
-    //   {
-    //     name: 'Overview',
-    //     path: '/',
-    //   },
-    //   {
-    //     name: 'Finance',
-    //     path: '/finance',
-    //   },
-    // ],
   },
-  // {
-  //   icon: <MegaphoneIcon />,
-  //   name: 'Marketing',
-  //   subItems: [
-  //     {
-  //       name: 'Analytics',
-  //       path: '/marketing',
-  //     },
-  //     {
-  //       name: 'UTM Links',
-  //       path: `/utm-links`,
-  //     },
-  //   ],
-  // },
   {
     icon: <List />,
-    name: 'Reports',
+    name: t('navigation.reports'),
     subItems: [
       {
-        name: 'Casino',
+        name: t('navigation.casino'),
         path: `/reports/casino`,
       },
     ],
   },
   {
     icon: <SettingsIcon />,
-    name: 'Platform Settings',
+    name: t('navigation.platformSettings'),
     subItems: [
       {
-        name: 'Site Settings',
+        name: t('navigation.siteSettings'),
         path: `/settings`,
       },
       {
-        name: 'IP',
+        name: t('navigation.ip'),
         path: `/ip`,
       },
       {
-        name: 'CMS',
+        name: t('navigation.cms'),
         path: `/cms`,
       },
-      // {
-      //   name: 'Email Template',
-      //   path: `/email-template`,
-      // },
-      // {
-      //   name: 'Operating Providers',
-      //   path: `/operating-providers`,
-      // },
-      // {
-      //   name: 'Crypto Assets',
-      //   path: `/crypto/assets`,
-      // },
-      // {
-      //   name: 'Crypto Wallet',
-      //   path: `/crypto/wallet`,
-      // },
     ],
   },
   {
-    name: 'Transactions',
+    name: t('navigation.transactions'),
     icon: <DollarLineIcon />,
     subItems: [
       {
-        name: 'Deposit',
+        name: t('navigation.deposit'),
         path: '/transactions/deposit',
         pro: false,
       },
       {
-        name: 'Withdraw',
+        name: t('navigation.withdraw'),
         path: '/transactions/withdraw',
         pro: false,
       },
@@ -116,91 +77,69 @@ export const navItems: NavItem[] = [
   },
   {
     icon: <UserCircleIcon />,
-    name: 'Admin Management',
+    name: t('navigation.adminManagement'),
     subItems: [
       {
-        name: 'Admins',
+        name: t('navigation.admins'),
         path: '/admins',
       },
-      // {
-      //   name: 'Roles',
-      //   path: `/roles`,
-      // },
     ],
   },
   {
     icon: <UserRoundCog />,
-    name: 'User Management',
+    name: t('navigation.userManagement'),
     subItems: [
       {
-        name: 'Users',
+        name: t('navigation.users'),
         path: `/users`,
       },
       {
-        name: 'Bot Users',
+        name: t('navigation.botUsers'),
         path: `/bot-users`,
       },
     ],
   },
   {
     icon: <HandHeartIcon />,
-    name: 'Loyalty Tiers (VIP)',
+    name: t('navigation.loyaltyTiers'),
     path: `/tier`,
   },
-  // {
-  //   icon: <UsersRound />,
-  //   name: 'Affiliate',
-  //   subItems: [
-  //     {
-  //       name: 'User Affiliate',
-  //       path: `/user-affiliate`,
-  //     },
-  //     {
-  //       name: 'Tier Affiliate',
-  //       path: `/tier-affiliate`,
-  //     },
-  //     {
-  //       name: 'UTM Links',
-  //       path: `/utm-links`,
-  //     },
-  //   ],
-  // },
   {
     icon: <PromotionIcon stroke='#E4E7EC' />,
-    name: 'Promotions',
+    name: t('navigation.promotions'),
     path: `/promotion`,
   },
   {
     icon: <BannerIcon stroke='#E4E7EC' />,
-    name: 'Banners',
+    name: t('navigation.banners'),
     path: `/banner`,
   },
   {
     icon: <GiftIcon />,
-    name: 'Bonus & Reward',
+    name: t('navigation.bonusReward'),
     subItems: [
       {
-        name: 'Bonuses',
+        name: t('navigation.bonuses'),
         path: `/bonus`,
       },
     ],
   },
   {
-    name: 'Games',
+    name: t('navigation.games'),
     icon: <GamePadIcon />,
     subItems: [
       {
-        name: 'Free Spins',
+        name: t('navigation.freeSpins'),
         path: '/game/free-spins',
         pro: false,
       },
       {
-        name: 'Providers',
+        name: t('navigation.providers'),
         path: '/game/casino/providers',
         pro: false,
       },
       {
-        name: 'Game Categories',
+        name: t('navigation.gameCategories'),
         path: '/games/categories',
         pro: false,
       },
@@ -208,7 +147,7 @@ export const navItems: NavItem[] = [
   },
   {
     icon: <Key stroke='#E4E7EC' />,
-    name: 'API Key',
+    name: t('navigation.apiKey'),
     path: `/apikey`,
   },
 ]
@@ -217,6 +156,9 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar()
   const pathname = usePathname()
   const { allowedRoutes } = useAuth()
+  const { t } = useI18n()
+  
+  const navItems = useMemo(() => getNavItems(t), [t])
 
   // Check if a route is allowed based on allowedRoutes
   const isRouteAllowed = useCallback(
@@ -241,7 +183,7 @@ const AppSidebar: React.FC = () => {
 
   const filteredNavItems = useMemo(
     () => navItems.filter((nav) => isRouteAllowed(nav)),
-    [isRouteAllowed]
+    [isRouteAllowed, navItems]
   )
 
   const renderMenuItems = () => (

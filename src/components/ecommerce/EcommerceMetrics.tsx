@@ -5,6 +5,8 @@ import { toast } from 'sonner'
 
 import { getMetrics } from '@/api/metrics'
 
+import { useI18n } from '@/context/I18nContext'
+
 import { formatNumber } from '@/lib/utils'
 
 import Loading from '@/components/common/Loading'
@@ -14,6 +16,7 @@ import PixIcon from '../../../public/images/icons/pix.svg'
 import { IMetrics } from '@/types/metrics'
 
 export const EcommerceMetrics = () => {
+  const { t } = useI18n()
   const [metrics, setMetrics] = useState<IMetrics>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -25,7 +28,7 @@ export const EcommerceMetrics = () => {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error fetching metrics')
+        toast.error(t('common.errorFetchingMetrics'))
       }
     }
     setIsLoading(false)

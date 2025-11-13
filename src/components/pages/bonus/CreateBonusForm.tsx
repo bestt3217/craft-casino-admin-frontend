@@ -8,6 +8,8 @@ import { toast } from 'sonner'
 
 import { createBonus } from '@/api/bonus'
 
+import { useI18n } from '@/context/I18nContext'
+
 import {
   BonusEligibility,
   bonusFormSchema,
@@ -35,6 +37,7 @@ interface CreateBonusFormProps {
 }
 
 const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
+  const { t } = useI18n()
   const [isLoading, setIsLoading] = useState(false)
   const [selectedBonusType, setSelectedBonusType] = useState<BonusType>(
     BonusType.DEPOSIT
@@ -139,7 +142,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
       })
 
       if (response?.success) {
-        toast.success('Bonus created successfully!')
+        toast.success(t('bonus.bonusCreatedSuccessfully'))
         if (onSuccess) {
           onSuccess(response.bonus._id)
         } else {
@@ -148,7 +151,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
       }
     } catch (error) {
       console.error('Error creating bonus:', error)
-      toast.error(error.message || 'Failed to create bonus')
+      toast.error(error.message || t('bonus.errorCreatingBonus'))
     } finally {
       setIsLoading(false)
     }
@@ -194,10 +197,10 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
         {/* Basic Information */}
-        <ComponentCard title='Basic Information'>
+        <ComponentCard title={t('bonus.basicInformation')}>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <div>
-              <Label>Bonus Title</Label>
+              <Label>{t('bonus.bonusTitle')}</Label>
               <Controller
                 name='name'
                 control={control}
@@ -206,7 +209,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                     {...field}
                     name='name'
                     type='text'
-                    placeholder='Enter bonus title'
+                    placeholder={t('bonus.enterBonusTitle')}
                     error={!!formState.errors.name}
                     errorMessage={formState.errors.name?.message as string}
                   />
@@ -215,7 +218,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
             </div>
 
             <div>
-              <Label>Bonus Type</Label>
+              <Label>{t('bonus.bonusType')}</Label>
               <Controller
                 name='type'
                 control={control}
@@ -224,7 +227,7 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
                     {...field}
                     value={field.value}
                     options={bonusTypeOptions}
-                    placeholder='Select bonus type'
+                    placeholder={t('bonus.selectBonusType')}
                     onChange={(value) =>
                       handleBonusTypeChange(value as BonusType)
                     }
@@ -233,14 +236,14 @@ const CreateBonusForm: React.FC<CreateBonusFormProps> = ({ onSuccess }) => {
               />
             </div>
             <div>
-              <Label>Bonus Description</Label>
+              <Label>{t('bonus.bonusDescription')}</Label>
               <Controller
                 name='description'
                 control={control}
                 render={({ field }) => (
                   <TextArea
                     {...field}
-                    placeholder='Enter bonus description'
+                    placeholder={t('bonus.bonusDescription')}
                     rows={3}
                     error={!!formState.errors.description}
                     hint={formState.errors.description?.message as string}

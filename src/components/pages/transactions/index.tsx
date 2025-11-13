@@ -14,6 +14,8 @@ import {
   rejectWithdrawal,
 } from '@/api/transactions'
 
+import { useI18n } from '@/context/I18nContext'
+
 import { TRANSACTION_STATUSES } from '@/lib/transaction'
 
 import ComponentCard from '@/components/common/ComponentCard'
@@ -28,29 +30,30 @@ import { Card } from '@/components/ui/card'
 
 export default function Transactions() {
   const { type } = useParams()
+  const { t } = useI18n()
 
   const title = useMemo(
-    () => (type === 'deposit' ? 'Deposits' : 'Withdrawals'),
-    [type]
+    () => (type === 'deposit' ? t('common.deposits') : t('common.withdrawals')),
+    [type, t]
   )
 
   const statusOptions = useMemo(() => {
     if (type === 'deposit') {
       return [
         {
-          label: 'All',
+          label: t('common.all'),
           value: '',
         },
         {
-          label: 'Pending',
+          label: t('common.pending'),
           value: String(TRANSACTION_STATUSES.CREATED),
         },
         {
-          label: 'Paid',
+          label: t('common.paid'),
           value: String(TRANSACTION_STATUSES.PAID),
         },
         {
-          label: 'Rejected',
+          label: t('common.rejected'),
           value: String(TRANSACTION_STATUSES.REJECTED),
         },
       ]
@@ -58,52 +61,52 @@ export default function Transactions() {
 
     return [
       {
-        label: 'All',
+        label: t('common.all'),
         value: '',
       },
       {
-        label: 'Pending',
+        label: t('common.pending'),
         value: String(TRANSACTION_STATUSES.WAITING_APPROVAL),
       },
       {
-        label: 'Paid',
+        label: t('common.paid'),
         value: String(TRANSACTION_STATUSES.PAID),
       },
       {
-        label: 'Rejected',
+        label: t('common.rejected'),
         value: String(TRANSACTION_STATUSES.REJECTED),
       },
     ]
-  }, [type])
+  }, [type, t])
 
   const tableColumns = useMemo(
     () => [
       {
         id: 'user',
-        label: 'User',
+        label: t('common.user'),
         col: 2,
         render: (item: any) => <UserCell user={item.userId} />,
       },
       {
         id: 'method',
-        label: 'Payment Method',
+        label: t('common.paymentMethod'),
         col: 2,
         render: (item) => <PaymentMethodCell method={item.method} />,
       },
       {
         id: 'paymentKey',
-        label: 'Account Number',
+        label: t('common.accountNumber'),
         col: 2,
         disabled: type === 'deposit',
         render: (item) => item.paymentKey,
       },
       {
         id: 'amount',
-        label: 'Amount',
+        label: t('common.amount'),
         col: 2,
         render: (item) => {
           if (item.status !== 1 && type === 'deposit') {
-            return 'N/A'
+            return t('common.na')
           }
 
           return Number(item.amount).toFixed(2)
@@ -111,19 +114,19 @@ export default function Transactions() {
       },
       {
         id: 'time',
-        label: 'Time',
+        label: t('common.time'),
         col: 2,
         render: (item) => moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
         id: 'status',
-        label: 'Status',
+        label: t('common.status'),
         col: 2,
         render: (item) => <StatusCell item={item} />,
       },
       {
         id: 'action',
-        label: 'Action',
+        label: t('common.action'),
         col: 2,
         render: (item: any) => (
           <>
@@ -133,7 +136,7 @@ export default function Transactions() {
                   className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleDepositRequestReject(item._id)}
                 >
-                  Reject
+                  {t('common.reject')}
                 </button>
               </div>
             )}
@@ -144,13 +147,13 @@ export default function Transactions() {
                   className='bg-success-500 shadow-theme-xs hover:bg-success-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleApproveWithdrawal(item._id)}
                 >
-                  Approve
+                  {t('common.approve')}
                 </button>
                 <button
                   className='bg-error-500 shadow-theme-xs hover:bg-error-600 rounded-xl px-3 py-[6px] text-sm font-medium text-white transition-colors'
                   onClick={() => handleRejectWithdrawal(item._id)}
                 >
-                  Reject
+                  {t('common.reject')}
                 </button>
               </div>
             ) : null}
@@ -159,7 +162,7 @@ export default function Transactions() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [type]
+    [type, t]
   )
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -212,10 +215,10 @@ export default function Transactions() {
         percent: rate,
         description:
           rate < 50
-            ? 'Approval rate is low!'
+            ? t('common.approvalRateLow')
             : rate < 70
-              ? 'Approval rate is moderate!'
-              : 'Approval rate is good!',
+              ? t('common.approvalRateModerate')
+              : t('common.approvalRateGood'),
       }
 
       setSeedData({ paid, pending, health })
@@ -223,12 +226,12 @@ export default function Transactions() {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error fetching seed data')
+        toast.error(t('common.errorFetchingSeedData'))
       }
     } finally {
       setIsLoadingSeedData(false)
     }
-  }, [type])
+  }, [type, t])
 
   useEffect(() => {
     fetchSeedData()
@@ -266,7 +269,7 @@ export default function Transactions() {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error fetching transactions')
+        toast.error(t('common.errorFetchingTransactions'))
       }
     } finally {
       setIsLoading(false)
@@ -308,7 +311,7 @@ export default function Transactions() {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error approving withdrawal')
+        toast.error(t('common.errorApprovingWithdrawal'))
       }
     } finally {
       setIsLoading(false)
@@ -324,7 +327,7 @@ export default function Transactions() {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error approving withdrawal')
+        toast.error(t('common.errorRejectingWithdrawal'))
       }
     } finally {
       setIsLoading(false)
@@ -341,7 +344,7 @@ export default function Transactions() {
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
-        toast.error('Error approving withdrawal')
+        toast.error(t('common.errorRejectingWithdrawal'))
       }
     } finally {
       setIsLoading(false)
@@ -366,7 +369,7 @@ export default function Transactions() {
         <div className='flex items-center gap-2'>
           <Select
             options={statusOptions || []}
-            placeholder='Select a status'
+            placeholder={t('common.selectStatus')}
             onChange={handleChangeStatus}
             value={selectedStatus}
             className='min-w-[200px]'
@@ -375,8 +378,8 @@ export default function Transactions() {
           <button
             onClick={handleReload}
             className='flex h-11 min-w-11 items-center justify-center rounded-lg border border-gray-300 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300'
-            title='Reload'
-            aria-label='Reload transactions'
+            title={t('common.reload')}
+            aria-label={t('common.reload')}
           >
             <RotateCcw className='h-5 w-5' />
           </button>
@@ -385,7 +388,9 @@ export default function Transactions() {
     >
       <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
         <Card>
-          <h3 className='text-sm font-medium text-gray-400'>Approved</h3>
+          <h3 className='text-sm font-medium text-gray-400'>
+            {t('common.approved')}
+          </h3>
           {isLoadingSeedData ? (
             <>
               <Skeleton className='mb-2 h-8 w-16' />
@@ -397,13 +402,15 @@ export default function Transactions() {
                 {seedData.paid.count}
               </p>
               <p className='text-sm text-gray-400'>
-                Total Approved | TRY ₺ {seedData.paid.totalAmount}
+                {t('common.totalApproved')} | TRY ₺ {seedData.paid.totalAmount}
               </p>
             </>
           )}
         </Card>
         <Card>
-          <h3 className='text-sm font-medium text-gray-400'>Pending</h3>
+          <h3 className='text-sm font-medium text-gray-400'>
+            {t('common.pending')}
+          </h3>
           {isLoadingSeedData ? (
             <>
               <Skeleton className='mb-2 h-8 w-16' />
@@ -415,13 +422,16 @@ export default function Transactions() {
                 {seedData.pending.count}
               </p>
               <p className='text-sm text-gray-400'>
-                Total Outstanding | TRY ₺ {seedData.pending.totalAmount}
+                {t('common.totalOutstanding')} | TRY ₺{' '}
+                {seedData.pending.totalAmount}
               </p>
             </>
           )}
         </Card>
         <Card>
-          <h3 className='text-sm font-medium text-gray-400'>Health</h3>
+          <h3 className='text-sm font-medium text-gray-400'>
+            {t('common.health')}
+          </h3>
           {isLoadingSeedData ? (
             <>
               <Skeleton className='mb-2 h-8 w-16' />

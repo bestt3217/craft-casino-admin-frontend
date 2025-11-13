@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { createBanner, getBanners, updateBanner } from '@/api/banner'
 
+import { useI18n } from '@/context/I18nContext'
 import { BannerFormValues, sectionOptions } from '@/lib/banner'
 import { useModal } from '@/hooks/useModal'
 
@@ -19,6 +20,7 @@ import { PlusIcon } from '@/icons'
 import { IBannerData } from '@/types/banner'
 
 export default function BannerListPage() {
+  const { t } = useI18n()
   const [bannerData, setBannerData] = useState<IBannerData[]>([])
   const [page, setPage] = useState<number>(1)
   const [limit] = useState<number>(10)
@@ -59,21 +61,21 @@ export default function BannerListPage() {
 
   const handleOnSubmit = async (data: BannerFormValues) => {
     if (selectedBanner && data.image === '') {
-      toast.error('Please upload promotion icon')
+      toast.error(t('banner.pleaseUploadPromotionIcon'))
       return false
     }
     try {
       if (selectedBanner) {
         const res = await updateBanner(selectedBanner._id, data as IBannerData)
         if (res.success) {
-          toast.success('Promotion updated successfully')
+          toast.success(t('banner.promotionUpdatedSuccessfully'))
         } else {
           toast.error(res.message)
         }
       } else {
         const res = await createBanner(data as IBannerData)
         if (res.success) {
-          toast.success('Promotion created successfully')
+          toast.success(t('banner.promotionCreatedSuccessfully'))
         } else {
           toast.error(res.message)
         }
@@ -97,18 +99,18 @@ export default function BannerListPage() {
     <div>
       <div className='space-y-6'>
         <ComponentCard
-          title='Banners'
+          title={t('banner.banners')}
           inputSearchElement={
             <Select
-              options={[{ value: 'all', label: 'all' }, ...sectionOptions]}
-              placeholder='Select section'
+              options={[{ value: 'all', label: t('common.all') }, ...sectionOptions]}
+              placeholder={t('banner.selectSection')}
               onChange={fetchBanners}
             />
           }
           action={
             <Button onClick={CreateBannerModal.openModal} size='xs'>
               <PlusIcon />
-              Add Banner
+              {t('banner.createBanner')}
             </Button>
           }
         >

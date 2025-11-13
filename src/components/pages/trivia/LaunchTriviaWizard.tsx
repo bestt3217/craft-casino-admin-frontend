@@ -4,6 +4,8 @@ import { toast } from 'sonner'
 
 import { getAllQuestions, launchTrivia } from '@/api/trivia'
 
+import { useI18n } from '@/context/I18nContext'
+
 import ConfirmModal from '@/components/common/ConfirmModal'
 import Loading from '@/components/common/Loading'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
@@ -15,15 +17,16 @@ import Button from '@/components/ui/button/Button'
 
 import { Question } from '@/types/trivia'
 
-const WizardSteps = [
-  'Select Question',
-  'Confirm Question',
-  'Count Down',
-  'Live Monitor',
-]
-
 const LaunchTriviaWizard = () => {
+  const { t } = useI18n()
   const [isLoading, setIsLoading] = useState(false)
+  
+  const WizardSteps = [
+    t('trivia.selectQuestion'),
+    t('trivia.confirmQuestion'),
+    t('trivia.countDown'),
+    t('trivia.liveMonitor'),
+  ]
   const [questions, setQuestions] = useState<Question[]>([])
   const [step, setStep] = useState(1)
   const [questionSelectType, setQuestionSelectType] = useState('manual')
@@ -42,7 +45,7 @@ const LaunchTriviaWizard = () => {
       const res = await getAllQuestions()
       setQuestions(res)
     } catch {
-      toast.error('Error fetching questions')
+      toast.error(t('common.errorOccurred'))
     } finally {
       setIsLoading(false)
     }
@@ -179,7 +182,7 @@ const LaunchTriviaWizard = () => {
                   value={type}
                   checked={questionSelectType === type}
                   onChange={() => setQuestionSelectType(type)}
-                  label={type.charAt(0).toUpperCase() + type.slice(1)}
+                  label={type === 'manual' ? t('trivia.manual') : t('trivia.random')}
                 />
               ))}
             </div>
