@@ -15,7 +15,6 @@ import {
   BonusStatus,
   BonusType,
   bonusTypeOptions,
-  eligibilityOptions,
   statusOptions,
 } from '@/lib/bonus'
 
@@ -25,9 +24,9 @@ import Input from '@/components/form/input/InputField'
 import TextArea from '@/components/form/input/TextArea'
 import Label from '@/components/form/Label'
 import Select from '@/components/form/Select'
+import BonusConfig from '@/components/pages/bonus/reward-config/BonusConfig'
 import Button from '@/components/ui/button/Button'
 
-import ImageUpload from './ImageUpload'
 import FreespinConfig from './reward-config/FreespinConfig'
 import RealMoneyConfig from './reward-config/RealMoneyConfig'
 
@@ -58,24 +57,32 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
       type: BonusType.WELCOME,
       status: BonusStatus.DRAFT,
       eligibility: BonusEligibility.ALL,
-      rewardType: 'real-money',
-      defaultWageringMultiplier: 35,
+      rewardType: 'bonus',
+      defaultWageringMultiplier: 0,
+      bannerImage: '',
       cash: {
         type: 'percentage',
         percentage: 100,
         fixedAmount: 0,
         maxAmount: 500,
       },
-      freeSpins: {
-        amount: 50,
-        gameId: '',
-        expiry: '7',
+      bonus: {
+        type: 'percentage',
+        percentage: 100,
+        fixedAmount: 0,
+        maxAmount: 500,
       },
-      bannerImage: '',
+      // freeSpins: {
+      //   amount: 50,
+      //   gameId: '',
+      //   expiry: '7',
+      // },
     },
   })
 
-  const { handleSubmit, setValue, reset, control, trigger } = methods
+  const { handleSubmit, setValue, watch, reset, control, trigger, formState } =
+    methods
+  const watchedRewardType = watch('rewardType')
 
   // Load bonus data
   useEffect(() => {
@@ -85,9 +92,13 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
         const { bonus } = response
 
         // Determine reward type from bonus data based on actual backend structure
-        let rewardType = 'real-money'
+        let rewardType = 'bonus'
         if (bonus.defaultReward?.freeSpins?.amount > 0) {
           rewardType = 'free-spins'
+        } else if (bonus.defaultReward?.cash) {
+          rewardType = 'real-money'
+        } else if (bonus.defaultReward?.bonus) {
+          rewardType = 'bonus'
         }
 
         // Extract reward data - handle both possible backend structures
@@ -101,12 +112,22 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
           status: bonus.status,
           eligibility: bonus.metadata?.eligibility || BonusEligibility.ALL,
           rewardType: rewardType as any,
-          defaultWageringMultiplier: bonus.defaultWageringMultiplier || 35,
+          defaultWageringMultiplier: bonus.defaultWageringMultiplier || 0,
           cash: {
             type: 'percentage',
             percentage: defaultReward.cash?.percentage || 100,
             fixedAmount: defaultReward.cash?.amount || 0,
             maxAmount: defaultReward.cash?.maxAmount || 0,
+          },
+          bonus: {
+            type:
+              defaultReward.bonus?.amount && defaultReward.bonus.amount > 0
+                ? 'fixed'
+                : 'percentage',
+            percentage: defaultReward.bonus?.percentage || 100,
+            fixedAmount: defaultReward.bonus?.amount || 0,
+            maxAmount: defaultReward.bonus?.maxAmount || 500,
+            depositCount: bonus.metadata?.depositCount,
           },
           freeSpins: {
             amount: defaultReward.freeSpins?.amount || 50,
@@ -142,23 +163,40 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
       // Prepare reward data based on selected rewardType
       let rewardData = {}
 
+      let depositCount = null
       if (data.rewardType === 'real-money') {
         rewardData = {
-          cash: data.cash,
+          cash: {
+            type: data.cash.type,
+            percentage: data.cash.percentage,
+            fixedAmount: data.cash.fixedAmount,
+            maxAmount: data.cash.maxAmount,
+          },
         }
+        depositCount = data.cash.depositCount
       } else if (data.rewardType === 'free-spins') {
         rewardData = {
           freeSpins: data.freeSpins,
         }
+      } else if (data.rewardType === 'bonus') {
+        rewardData = {
+          bonus: {
+            type: data.bonus.type,
+            percentage: data.bonus.percentage,
+            fixedAmount: data.bonus.fixedAmount,
+            maxAmount: data.bonus.maxAmount,
+          },
+        }
+        depositCount = data.bonus.depositCount
       }
 
       // Prepare the data to send to backend
       const {
         type,
-        eligibility: _eligibility,
-        cash: _cash,
-        freeSpins: _freeSpins,
         bannerImage,
+        cash: _cash,
+        eligibility: _eligibility,
+        freeSpins: _freeSpins,
         ...basicData
       } = data
       const bonusData = {
@@ -168,8 +206,11 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
         type,
         // Add depositCount for deposit type bonuses
         metadata: {
-          ...(type === BonusType.DEPOSIT && { depositCount: 1 }),
           eligibility: data.eligibility,
+          ...(type === BonusType.DEPOSIT &&
+            depositCount && {
+              depositCount,
+            }),
         },
       }
 
@@ -208,16 +249,18 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
       return [
         { label: 'Free Spins', value: 'free-spins' },
         { label: 'Real Money', value: 'real-money' },
+        { label: 'Bonus', value: 'bonus' },
       ]
     } else if (selectedBonusType === BonusType.DEPOSIT) {
       return [
-        { label: 'Real Money', value: 'real-money' },
-        { label: 'Free Spins', value: 'free-spins' },
+        // { label: 'Real Money', value: 'real-money' },
+        { label: 'Bonus', value: 'bonus' },
+        // { label: 'Free Spins', value: 'free-spins' },
       ]
     }
     return [
       { label: 'Real Money', value: 'real-money' },
-      { label: 'Free Spins', value: 'free-spins' },
+      // { label: 'Free Spins', value: 'free-spins' },
     ]
   }
 
@@ -242,6 +285,8 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
                     name='name'
                     type='text'
                     placeholder='Enter bonus title'
+                    error={!!formState.errors.name}
+                    errorMessage={formState.errors.name?.message as string}
                   />
                 )}
               />
@@ -275,6 +320,8 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
                     {...field}
                     placeholder='Enter bonus description'
                     rows={3}
+                    error={!!formState.errors.description}
+                    hint={formState.errors.description?.message as string}
                   />
                 )}
               />
@@ -295,7 +342,7 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
                 )}
               />
             </div>
-            <div>
+            {/* <div>
               <Label>Eligibility</Label>
               <Controller
                 name='eligibility'
@@ -312,15 +359,15 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
                   />
                 )}
               />
-            </div>
+            </div> */}
 
-            <div className='md:col-span-2'>
+            {/* <div className='md:col-span-2'>
               <ImageUpload
                 name='bannerImage'
                 label='Bonus Banner'
                 description='Upload an image for the bonus banner (recommended: 400x200px)'
               />
-            </div>
+            </div> */}
           </div>
         </ComponentCard>
 
@@ -336,32 +383,48 @@ const EditBonusForm: React.FC<EditBonusFormProps> = ({
                   <Select
                     {...field}
                     value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value)
+                      setValue('defaultWageringMultiplier', 0, {
+                        shouldDirty: true,
+                      })
+                    }}
                     options={getRewardTypeOptions()}
                     placeholder='Select reward type'
                   />
                 )}
               />
             </div>
-            <div>
-              <Label>Wagering Multiplier</Label>
-              <Controller
-                name='defaultWageringMultiplier'
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type='number'
-                    placeholder='Enter wagering multiplier'
-                  />
-                )}
-              />
-            </div>
+            {watchedRewardType === 'bonus' && (
+              <div>
+                <Label>Wagering Multiplier</Label>
+                <Controller
+                  name='defaultWageringMultiplier'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      onBlur={field.onBlur}
+                      error={!!formState.errors.defaultWageringMultiplier}
+                      errorMessage={
+                        formState.errors.defaultWageringMultiplier
+                          ?.message as string
+                      }
+                      type='number'
+                      placeholder='Enter wagering multiplier'
+                    />
+                  )}
+                />
+              </div>
+            )}
           </div>
 
           {/* Conditional reward configurations */}
           <div className='mt-6'>
             <FreespinConfig game={game} control={control} />
             <RealMoneyConfig control={control} />
+            <BonusConfig control={control} />
           </div>
         </ComponentCard>
 
