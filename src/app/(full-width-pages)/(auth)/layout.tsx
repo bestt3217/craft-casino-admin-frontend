@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: React.PropsWithChildren) {
                   height={0}
                   sizes='100vw'
                   className='h-auto w-auto'
-                  src='/images/logo/logo.png'
+                  src='/images/logo/craft-logo.png'
                   alt='Logo'
                 />
               </Link>

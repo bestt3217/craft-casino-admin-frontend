@@ -157,7 +157,7 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname()
   const { allowedRoutes } = useAuth()
   const { t } = useI18n()
-  
+
   const navItems = useMemo(() => getNavItems(t), [t])
 
   // Check if a route is allowed based on allowedRoutes
@@ -374,23 +374,25 @@ const AppSidebar: React.FC = () => {
             {isExpanded || isHovered ? (
               <>
                 <Image
-                  className='dark:hidden'
-                  src='/images/logo/logo.png'
+                  className='h-auto w-auto dark:hidden'
+                  src='/images/logo/craft-logo.png'
                   alt='Logo'
-                  width={160}
-                  height={50}
+                  width={0}
+                  height={0}
+                  sizes='100vw'
                 />
                 <Image
-                  className='hidden dark:block'
-                  src='/images/logo/logo.png'
+                  className='hidden h-auto w-auto dark:block'
+                  src='/images/logo/craft-logo.png'
                   alt='Logo'
-                  width={160}
-                  height={50}
+                  width={0}
+                  height={0}
+                  sizes='100vw'
                 />
               </>
             ) : (
               <Image
-                src='/images/logo/logo-symbol.png'
+                src='/images/logo/craft-logo-symbol.png'
                 alt='Logo'
                 width={62}
                 height={62}
